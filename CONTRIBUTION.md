@@ -5,15 +5,14 @@ Thank you for your interest in contributing to our project! To ensure a smooth a
 ## Table of Contents
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
 - [How to Contribute](#how-to-contribute)
-    - [Creating a New Feature](#creating-a-new-feature)
-    - [Branch Naming Convention](#branch-naming-convention)
     - [Issues](#issues)
-    - [Pull Requests](#pull-requests)
+    - [Branch Naming Convention](#branch-naming-convention)
+    - [Creating a New Feature](#creating-a-new-feature)
     - [Merging Changes](#merging-changes)
-    - [Code Style](#code-style)
 - [Running Tests](#running-tests)
-- [Contact](#contact)
 
 ## Project Structure
 
@@ -68,6 +67,8 @@ Thank you for your interest in contributing to our project! To ensure a smooth a
    ```
 
 ## How to Contribute
+Don't implement new features or make changes directly in the main branch without crating a separate branch. This way you risk overwriting other developers' changes, losing your work, or introducing bugs in your code.
+
 ### Issues
 - Before creating a new issue, please check if it already exists.
 - Clearly describe the issue and provide steps to reproduce it if possible.
