@@ -109,8 +109,8 @@ Don't implement new features or make changes directly in the main branch without
 - Backend:
   ```bash
   cd backend
-  npm test
-  npm test:watch
-  npm test:cov
-  npm test:debug
+  npm test 
+  npm test:watch #runs the Jest test runner in watch mode
+  npm test:cov #runs the Jest test runner and generates a code coverage report
+  npm test:debug #runs the Jest tests with Node.js in debug mode, allowing you to attach a debugger
     ```
