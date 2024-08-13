@@ -1,1 +1,57 @@
-<p>profilseite works!</p>
+<div class="container profile-container">
+  <div class="row profile-header">
+    <h1 class="text-center">Profilseite</h1>
+  </div>
+
+
+  <div class="row profile-details mb-4">
+    <div class="col-md-4 d-flex justify-content-center">
+      <div class="profile-picture">
+        <img [src]="profileImage || defaultProfileImage" alt="Profilbild" class="img-fluid rounded-circle" />
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="profile-info">
+        <p>Vorname:{{ playerStats?.firstName }}</p>
+        <p>Nachname: {{ playerStats?.lastName }}</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="player-stats mb-4">
+    <h3 class="text-primary">Spielerstatistik</h3>
+    <p>Gewonnene Spiele: {{ playerStats?.wins }}</p>
+    <p>Verlorene Spiele: {{ playerStats?.losses }}</p>
+    <p>Aktuelle Elo-Zahl: {{ playerStats?.elo }}</p>
+  </div>
+
+
+  <div class="game-history mb-4">
+    <h3 class="text-primary">Spielhistorie</h3>
+    <ul class="list-group">
+      @for( game of gameHistory; track game) {
+      <li class="list-group-item">
+        {{ game.opponent }} - {{ game.result }} ({{ game.date }})
+      </li>
+      }
+    </ul>
+  </div>
+
+  <div class="profile-settings">
+    <h3 class="text-primary">Profil-Einstellungen</h3>
+    <form [formGroup]="profileForm" (ngSubmit)="onPasswordChange()">
+      <div class="mb-3">
+        <label for="password" class="form-label">Neues Passwort:</label>
+        <input id="password" formControlName="password" type="password" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-success" [disabled]="profileForm.invalid">Passwort ändern</button>
+    </form>
+
+    <h3 class="text-primary mt-4">Profilbild aktualisieren</h3>
+    <input type="file" (change)="onFileChange($event)" class="form-control" />
+    @if (uploadProgress > 0) {
+      <p class="mt-2"> Upload-Fortschritt: {{ uploadProgress }}%</p>
+    }
+  </div>
+</div>

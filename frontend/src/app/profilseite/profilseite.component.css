@@ -1,0 +1,37 @@
+.profile-container {
+  background-color: #f8f9fa; /* Helles Grau für den Hintergrund */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.profile-header h1 {
+  color: #343a40; /* Dunkles Grau für den Header */
+}
+
+.profile-details {
+  border-bottom: 1px solid #dee2e6; /* Trennlinie unter den Profil-Details */
+  padding-bottom: 20px;
+}
+
+.profile-picture img {
+  width: 150px; /* Bildgröße anpassen */
+  height: 150px;
+  object-fit: cover; /* Bild passend zum Container */
+}
+
+.profile-info p {
+  font-size: 16px;
+}
+
+.player-stats h3, .game-history h3, .profile-settings h3 {
+  color: #007bff; /* Primärfarbe (Blau) */
+}
+
+.game-history .list-group-item {
+  background-color: #ffffff; /* Weißer Hintergrund für die Listeneinträge */
+}
+
+.profile-settings .btn-success {
+  background-color: #28a745; /* Grüner Hintergrund für den Button */
+  border-color: #28a745; /* Button-Randfarbe */
+}
