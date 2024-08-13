@@ -1,1 +1,20 @@
-<p>matchmaking-queue works!</p>
+<div class="matchmaking-container">
+  <div class="header">
+    <h1>Tic-Tac-Toe Matchmaking</h1>
+    <p>Warte auf einen Gegner...</p>
+  </div>
+
+  @if (matchFound) {
+    <div class="match-found">
+      <p>Gegner gefunden! Du spielst gegen: {{ matchFound.username }}</p>
+      <button class="start-game-button" (click)="startGame()">Spiel starten</button>
+    </div>
+  }
+
+  @if (!matchFound) {
+    <div class="waiting-animation">
+      <div class="spinner"></div>
+      <p>Warten auf einen Gegner...</p>
+    </div>
+  }
+</div>
