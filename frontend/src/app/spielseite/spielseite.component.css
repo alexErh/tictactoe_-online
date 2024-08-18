@@ -1,0 +1,13 @@
+.spielbrett {
+  max-width: 300px; /* Limite la largeur maximale du tableau */
+  margin: 0 auto; /* Centre le tableau horizontalement */
+}
+
+.cell {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background-color: #f0f0f0; /* Ajoute un effet au survol des cellules */
+}
