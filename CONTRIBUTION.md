@@ -75,13 +75,13 @@ Don't implement new features or make changes directly in the main branch without
 ### Branch Naming Convention
 - The branch name should follow this format:
     ```bash
-  [issue number]-[issue]-[name]
+  [issue-number]-[issue-name]
     ```
 ### Creating a New Feature
 - To create a new feature, you should work on a separate branch.
 - Create a new branch using the following command:
     ```bash
-  git checkout -b [issue number]-[issue]-[name]
+  git checkout -b [issue-number]-[issue-name]
     ```
   For example, a branch to create a login page on the frontend side:
     ```bash
@@ -93,9 +93,9 @@ Don't implement new features or make changes directly in the main branch without
 - Once the Merge Request is approved, you can merge the changes using the following commands:
     ```bash
     git checkout main
-    git pull origin main
-    git merge [your-branch-name]
-    git push origin main
+    git pull origin main //update local main branch to the latest version
+    git merge [your-branch-name] //merge changes made in your feature branch to the main
+    git push origin main //push changes to the main
     ```
   Sometimes Merge Conflicts are acquiring. In this case please check this [GitHub Documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line) or research, how you can resolve them in your IDE.
 
