@@ -10,13 +10,13 @@ export class User {
     password: string;
 
     @Column({ default: 1000 })
-    score: number;
+    score?: number;
 
     @Column({ default: false })
-    isAdmin: boolean;
+    isAdmin?: boolean;
 
     @Column({
         type: 'blob'
     })
-    img: Buffer;
+    img?: Buffer;
 }
