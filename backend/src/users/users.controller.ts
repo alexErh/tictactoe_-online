@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, UploadedFile} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UploadedFiles} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {CreateUserDto} from "./dto/createUserDto";
 import {ApiResponse} from "@nestjs/swagger";
 import { User } from 'src/database/tables/User';
+import { UpdateUserDto } from './dto/updateUserDto';
 
 
 @Controller('users')
@@ -22,8 +23,14 @@ export class UsersController {
     }
 
     @Post()
-    @ApiResponse({type: CreateUserDto})
-    create(@Body() createUserDto: CreateUserDto, @UploadedFile() img: Express.Multer.File): Promise<User>{
-        return this.usersService.create(createUserDto);
+    @ApiResponse({type: User})
+    async create(@Body() createUserDto: CreateUserDto, @UploadedFile() img: Express.Multer.File): Promise<User>{
+        return await this.usersService.create(createUserDto);
+    }
+
+    @Put(":nickname")
+    @ApiResponse({type: User})
+    async update(@Body() updateUserDto: UpdateUserDto, @UploadedFile() img: Express.Multer.File): Promise<User> {
+        return await this.update(updateUserDto, img);
     }
 }
