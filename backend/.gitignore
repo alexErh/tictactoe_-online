@@ -45,7 +45,7 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
-.tmp.sqlite
+*.sqlite
 
 # Runtime data
 pids

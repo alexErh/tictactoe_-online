@@ -4,10 +4,13 @@ import { User } from 'src/database/tables/User';
 import { CreateUserDto } from "./dto/createUserDto";
 import { UpdateUserDto } from './dto/updateUserDto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
 
 
 @Injectable()
 export class UsersService {
+
+    avatar_placeholder_path: string = 'src/assets/avatar_placeholder.jpeg';
 
     constructor(
         @InjectRepository(User)
@@ -25,13 +28,13 @@ export class UsersService {
         throw new NotFoundException();
     }
 
-    async create(createUserDto: CreateUserDto, file?: Express.Multer.File): Promise<User> {
+    async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<User> {
         const newUser: User = new User();
         
         newUser.nickname = createUserDto.nickname;
         newUser.password = createUserDto.password;
-        if (file)
-            newUser.img = file.buffer;
+        newUser.img =  img ? img.buffer : readFileSync(this.avatar_placeholder_path); //saving avatar placeholder if image was't uploaded
+
 
         const existingUser: User = await this.userRepository.findOne({ where: { nickname: newUser.nickname } });
 
