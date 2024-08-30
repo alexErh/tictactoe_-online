@@ -10,15 +10,16 @@ import {ConfigService, ConfigModule} from "@nestjs/config";
 
 
 @Module({
-  imports: [UsersModule,
-      ConfigModule,
-      JwtModule.registerAsync({
-          imports: [ConfigModule],
-          useFactory: async (configService: ConfigService) => ({
-              secret: configService.get<string>('JWT_SECRET'),
-              signOptions: {expiresIn: '15m'} //log out after 15 minutes
-          }),
-      inject: [ConfigService],
+  imports: [
+    UsersModule,
+    ConfigModule,
+    JwtModule.registerAsync({
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+            secret: configService.get<string>('JWT_SECRET'),
+            signOptions: {expiresIn: '15m'} //log out after 15 minutes
+        }),
+    inject: [ConfigService],
   }),
   ],
   controllers: [AuthController],

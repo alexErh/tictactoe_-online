@@ -13,20 +13,6 @@ export class UsersService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>
     ){}
-    // dummy data for testing
-    // todo replace it with database methods
-    private readonly users = [
-        {
-            userId: 1,
-            username: 'john',
-            password: 'changeme',
-        },
-        {
-            userId: 2,
-            username: 'maria',
-            password: 'guess',
-        },
-    ];
 
     async getAll(): Promise<User[]> {
         return this.userRepository.find();
