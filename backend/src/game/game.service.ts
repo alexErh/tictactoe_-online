@@ -24,20 +24,22 @@ export class GameService {
         return this.games.find(game => game.id === gameId);
     }
 
-    makeMove(gameId: number, position: number, player: string): boolean {
+    makeMove(gameId: number, position: number, playerName: string): boolean {
         const game = this.findGame(gameId);
-        if (!game || game.winner || game.currentTurn !== player) {
+        if (!game || game.winner || game.currentTurn !== playerName) {
             return false;
         }
 
-        const moveMade = game.board.makeMove(position, player as 'X' | 'O');
+        const playerSymbol: 'X' | 'O' = game.player1 === playerName ? 'X' : 'O';
+
+        const moveMade = game.board.makeMove(position, playerSymbol);
         if (!moveMade) {
             return false;
         }
 
         const winner = game.board.threeInARow();
         if (winner) {
-            game.winner = player;
+            game.winner = playerName;
         } else if (game.board.isDraw()) {
             game.winner = 'Draw';
         } else {
