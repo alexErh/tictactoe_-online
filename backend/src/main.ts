@@ -8,7 +8,7 @@ import * as crypto from 'crypto';
 declare module "express-session" {
     interface SessionData {
         isLoggedIn?: boolean;
-        user?: { id: number; username: string };
+        user?: { nickname: string };
     }
 }
 async function bootstrap() {
