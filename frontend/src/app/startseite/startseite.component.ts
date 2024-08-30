@@ -18,6 +18,6 @@ export class StartseiteComponent {
     // Hier können Sie eine Methode hinzufügen, um den Spieler zur Matchmaking-Queue hinzuzufügen
     console.log("Spieler in die Matchmaking-Queue eingetreten.");
     // Weiterleitung zur Spielseite
-    this.router.navigate(['/matchmaking-queue']);
+    this.router.navigate(['/matchmaking']);
   }
 }
