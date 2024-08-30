@@ -1,0 +1,50 @@
+import { Injectable } from '@nestjs/common';
+import {Board} from "./Board";
+import {Game} from "./Game"
+@Injectable()
+export class GameService {
+    private games: Game[] = [];
+    private nextGameId = 1;
+
+
+    createGame(player1: string, player2: string): Game {
+        const startingPlayer = Math.random() < 0.5 ? player1 : player2;
+        const newGame: Game = {
+            id: this.nextGameId++,
+            player1,
+            player2,
+            board: new Board(),
+            currentTurn: startingPlayer,
+            winner: null
+        };
+        this.games.push(newGame);
+        return newGame;
+    }
+    findGame(gameId: number): Game | undefined {
+        return this.games.find(game => game.id === gameId);
+    }
+
+    makeMove(gameId: number, position: number, player: string): boolean {
+        const game = this.findGame(gameId);
+        if (!game || game.winner || game.currentTurn !== player) {
+            return false;
+        }
+
+        const moveMade = game.board.makeMove(position, player as 'X' | 'O');
+        if (!moveMade) {
+            return false;
+        }
+
+        const winner = game.board.threeInARow();
+        if (winner) {
+            game.winner = player;
+        } else if (game.board.isDraw()) {
+            game.winner = 'Draw';
+        } else {
+            game.currentTurn = game.currentTurn === game.player1 ? game.player2 : game.player1;
+        }
+
+        return true;
+    }
+
+}

@@ -1,0 +1,1 @@
+type CellValue = null | 'X' | 'O';
