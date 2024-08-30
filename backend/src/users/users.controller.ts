@@ -4,6 +4,7 @@ import {CreateUserDto} from "./dto/createUserDto";
 import {ApiResponse} from "@nestjs/swagger";
 import { User } from 'src/database/tables/User';
 import { UpdateUserDto } from './dto/updateUserDto';
+import { Public } from 'src/auth/public.decorator';
 
 
 @Controller('users')
@@ -22,7 +23,8 @@ export class UsersController {
         return await this.usersService.getOne(nickname);
     }
 
-    @Post()
+    @Public()
+    @Post("signup")
     @ApiResponse({type: User})
     async create(@Body() createUserDto: CreateUserDto, @UploadedFile() img: Express.Multer.File): Promise<User>{
         return await this.usersService.create(createUserDto);

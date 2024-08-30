@@ -29,17 +29,16 @@ export class UsersService {
     }
 
     async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<User> {
-        const newUser: User = new User();
+        let newUser: User = new User();
         
         newUser.nickname = createUserDto.nickname;
         newUser.password = createUserDto.password;
         newUser.img =  img ? img.buffer : readFileSync(this.avatar_placeholder_path); //saving avatar placeholder if image was't uploaded
 
-
         const existingUser: User = await this.userRepository.findOne({ where: { nickname: newUser.nickname } });
 
         if (existingUser)
-            throw new ConflictException('User with this nickname already exists');
+            throw new ConflictException(`User with nickname ${existingUser.nickname} already exists`);
 
 
         const createdUser: User = await this.userRepository.save(newUser);

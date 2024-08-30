@@ -6,5 +6,3 @@
 
 # Visual Studio Code
 .vscode/
-# Environment variables file
-backend/.env
