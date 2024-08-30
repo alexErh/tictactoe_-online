@@ -13,7 +13,7 @@ export class AuthService {
             throw new UnauthorizedException();
         }
         session.isLoggedIn = true;
-        //session.user = { id: user.nickname };
+        session.user = { nickname: user.nickname };
     }
 
     signOut(session: SessionData): void {
