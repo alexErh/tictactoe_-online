@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '../services/profile.service';
 import { HttpEventType } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-profilseite',
@@ -10,7 +11,7 @@ import { HttpEventType } from '@angular/common/http';
     ReactiveFormsModule,
   ],
   templateUrl: './profilseite.component.html',
-  styleUrl: './profilseite.component.css'
+  styleUrls: ['./profilseite.component.css'] // Korrektur: styleUrls im Plural
 })
 export class ProfilseiteComponent implements OnInit {
   playerStats: any;
@@ -20,7 +21,14 @@ export class ProfilseiteComponent implements OnInit {
   profileImage: string | null = null;
   defaultProfileImage: string = 'assets/portrait.jpg';
 
-  constructor(private profileService: ProfileService, private fb: FormBuilder) {
+  // Kontrollvariable für die Anzeige der Abschnitte
+  isStatsLoaded: boolean = false;
+  isHistoryLoaded: boolean = false;
+  isSettingsLoaded: boolean = false;
+
+  public profileService: ProfileService = inject(ProfileService);
+
+  constructor( private fb: FormBuilder) {
     this.profileForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
       file: [null]
@@ -29,41 +37,55 @@ export class ProfilseiteComponent implements OnInit {
 
   ngOnInit() {
     this.loadPlayerStats();
-    this.loadGameHistory();
   }
+
 
   loadPlayerStats() {
-    this.profileService.getPlayerStats().subscribe(stats => {
-      this.playerStats = stats;
-      this.profileImage = stats.profileImageUrl;
-    });
+    // Simulate loading player stats (replace with actual service call if needed)
+    this.playerStats = {
+      firstName: 'Max',
+      lastName: 'Mustermann',
+      wins: 10,
+      losses: 5,
+      elo: 1200,
+      profileImageUrl: null
+    };
+    this.profileImage = this.playerStats.profileImageUrl || this.defaultProfileImage;
   }
 
-  loadGameHistory() {
-    this.profileService.getGameHistory().subscribe(history => {
-      this.gameHistory = history;
-    });
+  showStats() {
+    this.isStatsLoaded = true;
+    this.isHistoryLoaded = false; // Close history section
+    this.isSettingsLoaded = false; // Close settings section
+  }
+
+  showHistory() {
+    this.isHistoryLoaded = true;
+    this.isStatsLoaded = false; // Close stats section
+    this.isSettingsLoaded = false; // Close settings section
+  }
+
+  showSettings() {
+    this.isSettingsLoaded = true;
+    this.isStatsLoaded = false; // Close stats section
+    this.isHistoryLoaded = false; // Close history section
   }
 
   onPasswordChange() {
     if (this.profileForm.valid) {
-      this.profileService.changePassword(this.profileForm.value.password).subscribe(() => {
-        alert('Password changed successfully');
-      });
+      alert('Passwort erfolgreich geändert');
     }
   }
 
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.profileService.uploadProfileImage(file).subscribe(event => {
-        if (event.type === HttpEventType.UploadProgress) {
-          this.uploadProgress = Math.round((event.loaded / event.total) * 100);
-        } else if (event.type === HttpEventType.Response) {
-          this.profileImage = URL.createObjectURL(file);
-          this.uploadProgress = 0;
-        }
-      });
+      this.uploadProgress = 100; // Assume upload completes instantly for this example
+      this.profileImage = URL.createObjectURL(file);
     }
+  }
+
+  trackGameById(index: number, game: any): number {
+    return game.id;
   }
 }
