@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '../services/profile.service';
-import { HttpEventType } from '@angular/common/http';
+import { NgClass } from '@angular/common';
+import { RouterLink, RouterLinkActive, RouterOutlet, Routes } from '@angular/router';
 
 
 @Component({
@@ -9,6 +10,10 @@ import { HttpEventType } from '@angular/common/http';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    NgClass,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: './profilseite.component.html',
   styleUrls: ['./profilseite.component.css']
@@ -21,14 +26,13 @@ export class ProfilseiteComponent implements OnInit {
   profileImage: string | null = null;
   defaultProfileImage: string = 'assets/portrait.jpg';
 
-  // Kontrollvariable für die Anzeige der Abschnitte
   isStatsLoaded: boolean = false;
   isHistoryLoaded: boolean = false;
   isSettingsLoaded: boolean = false;
 
   public profileService: ProfileService = inject(ProfileService);
 
-  constructor( private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {
     this.profileForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
       file: [null]
@@ -37,11 +41,11 @@ export class ProfilseiteComponent implements OnInit {
 
   ngOnInit() {
     this.loadPlayerStats();
+    this.loadGameHistory();
   }
 
-
   loadPlayerStats() {
-    // Simulate loading player stats (replace with actual service call if needed)
+    // replace with actual service call
     this.playerStats = {
       firstName: 'Max',
       lastName: 'Mustermann',
@@ -53,27 +57,34 @@ export class ProfilseiteComponent implements OnInit {
     this.profileImage = this.playerStats.profileImageUrl || this.defaultProfileImage;
   }
 
+  loadGameHistory() {
+    // Simulierte Daten für Spielhistorie
+    this.gameHistory = [
+      { id: 1, opponent: 'Spieler A', result: 'Gewonnen', date: '01.01.2024' },
+      { id: 2, opponent: 'Spieler B', result: 'Verloren', date: '02.01.2024' },
+    ];
+  }
   showStats() {
-    this.isStatsLoaded = true;
-    this.isHistoryLoaded = false; // Close history section
-    this.isSettingsLoaded = false; // Close settings section
+    this.isStatsLoaded = !this.isStatsLoaded;
+    this.isHistoryLoaded = false;
+    this.isSettingsLoaded = false;
   }
 
   showHistory() {
-    this.isHistoryLoaded = true;
-    this.isStatsLoaded = false; // Close stats section
-    this.isSettingsLoaded = false; // Close settings section
+    this.isHistoryLoaded = !this.isHistoryLoaded;
+    this.isStatsLoaded = false;
+    this.isSettingsLoaded = false;
   }
 
   showSettings() {
-    this.isSettingsLoaded = true;
-    this.isStatsLoaded = false; // Close stats section
-    this.isHistoryLoaded = false; // Close history section
+    this.isSettingsLoaded = !this.isSettingsLoaded;
+    this.isStatsLoaded = false;
+    this.isHistoryLoaded = false;
   }
-
   onPasswordChange() {
     if (this.profileForm.valid) {
       alert('Passwort erfolgreich geändert');
+      this.profileForm.reset();
     }
   }
 
@@ -88,4 +99,5 @@ export class ProfilseiteComponent implements OnInit {
   trackGameById(index: number, game: any): number {
     return game.id;
   }
+
 }
