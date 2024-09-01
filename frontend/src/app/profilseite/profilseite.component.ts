@@ -11,7 +11,7 @@ import { HttpEventType } from '@angular/common/http';
     ReactiveFormsModule,
   ],
   templateUrl: './profilseite.component.html',
-  styleUrls: ['./profilseite.component.css'] // Korrektur: styleUrls im Plural
+  styleUrls: ['./profilseite.component.css']
 })
 export class ProfilseiteComponent implements OnInit {
   playerStats: any;
@@ -80,7 +80,7 @@ export class ProfilseiteComponent implements OnInit {
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.uploadProgress = 100; // Assume upload completes instantly for this example
+      this.uploadProgress = 100;
       this.profileImage = URL.createObjectURL(file);
     }
   }
