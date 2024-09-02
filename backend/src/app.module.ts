@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import {ConfigModule} from "@nestjs/config";
 import {User} from "./database/tables/User";
+import { GameController } from './game/game.controller';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -16,9 +18,10 @@ import {User} from "./database/tables/User";
         synchronize: true,
       }),
       AuthModule, 
-      UsersModule
+      UsersModule, 
+      GameModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, GameController],
   providers: [AppService],
 })
 export class AppModule {}
