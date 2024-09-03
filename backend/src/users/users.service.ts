@@ -20,11 +20,17 @@ export class UsersService {
             userId: 1,
             username: 'john',
             password: 'changeme',
+
         },
         {
             userId: 2,
             username: 'maria',
             password: 'guess',
+        },
+        {
+            userId: 3,
+            username: 'Dunia',
+            password: 'Dunia',
         },
     ];
 
@@ -68,5 +74,9 @@ export class UsersService {
         userToUpdate.isAdmin = updateUserDto.isAdmin;
 
         return await this.userRepository.save(userToUpdate);
+    }
+
+    async findUserByNickname(nickname: string): Promise<User | undefined> {
+        return this.userRepository.findOne({ where: { nickname } });
     }
 }

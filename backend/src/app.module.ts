@@ -6,7 +6,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import {ConfigModule} from "@nestjs/config";
 import {User} from "./database/tables/User";
-import { GameModule } from './game/game.module';
+import { MatchGateway } from './match/match.gateway';
+import { MatchService } from './match/match.service';
+import { MatchmakingController } from './match/matchmaking/matchmaking.controller';
 
 @Module({
   imports: [
@@ -15,11 +17,14 @@ import { GameModule } from './game/game.module';
         database: './tmp.sqlite',
         entities: [User],
         synchronize: true,
+        extra: {
+          busyTimeout: 5000, // 5 Sekunden
+        },
       }),
       AuthModule, 
-      UsersModule, GameModule
+      UsersModule, //GameModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MatchmakingController],
+  providers: [AppService, MatchGateway, MatchService],
 })
 export class AppModule {}
