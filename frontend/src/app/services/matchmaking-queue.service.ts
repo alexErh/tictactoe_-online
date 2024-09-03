@@ -25,8 +25,9 @@ export class MatchmakingQueueService {
   }
 
   connect() {
-    this.socket = io('http://localhost:3000');
-  }
+    this.socket = io('http://localhost:3000', {
+      transports: ['websocket']
+    });  }
 
   emit(event: string, data: any) {
     this.socket.emit(event, data);
