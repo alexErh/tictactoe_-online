@@ -1,15 +1,23 @@
 //websocket verwalten
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MatchService } from './match.service';
 import { UsersService } from '../users/users.service';
-
 
 @WebSocketGateway({ cors: true, namespace: 'matchmaking' })
 export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private matchService: MatchService, private usersService: UsersService) {}
+  constructor(
+    private matchService: MatchService,
+    private usersService: UsersService,
+  ) {}
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
@@ -24,7 +32,6 @@ export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleIdentify(client: Socket, user: string) {
     await this.matchService.identify(user, client.id);
   }
-
 
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(client: Socket, nickname: string) {
@@ -43,6 +50,8 @@ export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('cancelQueue')
   async handleCancelQueue(client: Socket) {
     this.matchService.cancelQueue(client.id);
-    this.server.to(client.id).emit('queueCancelled', { message: 'Queue cancelled successfully.' });
+    this.server
+      .to(client.id)
+      .emit('queueCancelled', { message: 'Queue cancelled successfully.' });
   }
 }

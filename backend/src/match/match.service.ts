@@ -18,7 +18,9 @@ export class MatchService {
   async identify(user: string, clientId: string) {
     const existingUser = await this.userService.findUserByNickname(user);
     if (existingUser) {
-      console.log(`User identified: ${existingUser.nickname} with client ID: ${clientId}`);
+      console.log(
+        `User identified: ${existingUser.nickname} with client ID: ${clientId}`,
+      );
     } else {
       console.log(`User not found: ${user}`);
     }
@@ -26,11 +28,13 @@ export class MatchService {
 
   async findMatch(playerData: Player): Promise<Player | null> {
     const suitableOpponent = this.playersQueue.find(
-      player => Math.abs(player.elo - playerData.elo) < 200,
+      (player) => Math.abs(player.elo - playerData.elo) < 200,
     );
     //Wenn ein geeigneter Gegner gefunden wird, entfernt sie diesen aus der Warteschlange und gibt ihn zurück.
     if (suitableOpponent) {
-      this.playersQueue = this.playersQueue.filter(player => player.clientId !== suitableOpponent.clientId);
+      this.playersQueue = this.playersQueue.filter(
+        (player) => player.clientId !== suitableOpponent.clientId,
+      );
       return suitableOpponent;
     }
 
@@ -39,7 +43,9 @@ export class MatchService {
   }
 
   disconnect(clientId: string) {
-    this.playersQueue = this.playersQueue.filter(player => player.clientId !== clientId);
+    this.playersQueue = this.playersQueue.filter(
+      (player) => player.clientId !== clientId,
+    );
   }
 
   async getPlayerData(nickname: string): Promise<Player | null> {
@@ -55,6 +61,8 @@ export class MatchService {
   }
 
   cancelQueue(clientId: string) {
-    this.playersQueue = this.playersQueue.filter(player => player.clientId !== clientId);
+    this.playersQueue = this.playersQueue.filter(
+      (player) => player.clientId !== clientId,
+    );
   }
 }
