@@ -12,8 +12,7 @@ export interface Player {
   providedIn: 'root',
 })
 export class MatchmakingQueueService {
-  private socket: Socket;
-  // den aktuellen Status eines gefundenen Gegners speichert
+  private socket!: Socket;
   private matchFound$ = new BehaviorSubject<Player | null>(null);
 
   constructor() {
