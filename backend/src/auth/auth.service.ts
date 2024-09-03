@@ -1,3 +1,4 @@
+//Auth Logik, überprüft Benutzeranmeldeinformationen, setzt eine Sitzung des Benutzers
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import { SessionData } from 'express-session';

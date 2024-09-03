@@ -1,3 +1,4 @@
+//Authentifizierung überprüfen (isLoggedIN)
 import {
   CanActivate,
   ExecutionContext,
