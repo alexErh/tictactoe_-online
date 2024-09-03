@@ -6,8 +6,7 @@
 
   @if (matchFound) {
     <div class="match-found">
-      <p>Gegner gefunden! Du spielst gegen: {{ matchFound.username }}</p>
-      <button class="start-game-button" (click)="startGame()">Spiel starten</button>
+      <p>Gegner gefunden! Du spielst gegen: {{ matchFound.nickname }}({{ matchFound.elo }})</p>
     </div>
   }
 
@@ -15,6 +14,7 @@
     <div class="waiting-animation">
       <div class="spinner"></div>
       <p>Warten auf einen Gegner...</p>
+      <button class="btn btn-danger" (click)="confirmCancelQueue()">Abbrechen</button>
     </div>
   }
 </div>
