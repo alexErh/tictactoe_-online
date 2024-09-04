@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from 'src/database/tables/GameEntity';
 import { User } from 'src/database/tables/User';
@@ -41,6 +41,9 @@ export class GameService {
 
     async setWinner(data: UpdateGameDto): Promise<GameEntity> {
         const game: GameEntity = await this.gameRepository.findOne({ where: { id: data.id } });
+
+        if (!game.winner || game.winner.trim() !== '')
+            throw new ConflictException(`Winner already exist.`);
 
         game.winner = data.winner;
 

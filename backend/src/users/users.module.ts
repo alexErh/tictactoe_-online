@@ -6,7 +6,6 @@ import { User } from 'src/database/tables/User';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
-  imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService],
   exports: [UsersService],
   controllers: [UsersController],
