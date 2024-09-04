@@ -29,7 +29,7 @@ export class UsersService {
     }
 
     async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<User> {
-        let newUser: User = new User();
+        const newUser: User = new User();
         
         newUser.nickname = createUserDto.nickname;
         newUser.password = createUserDto.password;

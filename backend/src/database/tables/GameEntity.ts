@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedCo
 import { User } from "./User";
 
 @Entity()
-export class GameTable {
+export class GameEntity {
     @ApiProperty({ example: "d16fe161-169e-4b92-80d8-64808466fb88" })
     @PrimaryGeneratedColumn("uuid")
     id: string;

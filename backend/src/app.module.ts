@@ -8,14 +8,14 @@ import {ConfigModule} from "@nestjs/config";
 import {User} from "./database/tables/User";
 import { GameController } from './game/game.controller';
 import { GameModule } from './game/game.module';
-import { GameTable } from './database/tables/Game';
+import { GameEntity } from './database/tables/GameEntity';
 
 @Module({
   imports: [
       TypeOrmModule.forRoot({
         type: 'sqlite',
         database: './tmp.sqlite',
-        entities: [User, GameTable],
+        entities: [User, GameEntity],
         synchronize: true,
       }),
       AuthModule, 
