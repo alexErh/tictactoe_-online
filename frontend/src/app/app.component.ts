@@ -5,10 +5,11 @@ import { LoginComponent } from './login/login.component';
 import { MatchmakingQueueComponent } from './matchmaking-queue/matchmaking-queue.component';
 import { SpielseiteComponent } from './spielseite/spielseite.component';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RegistrationComponent, LoginComponent, MatchmakingQueueComponent, SpielseiteComponent ],
+  imports: [RouterOutlet, RegistrationComponent, LoginComponent, MatchmakingQueueComponent, SpielseiteComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

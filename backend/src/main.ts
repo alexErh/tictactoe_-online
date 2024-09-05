@@ -13,6 +13,7 @@ declare module "express-session" {
 }
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.use(
       session({
         secret: crypto.randomBytes(32).toString('hex'),

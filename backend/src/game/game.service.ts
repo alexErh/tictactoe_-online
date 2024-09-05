@@ -4,7 +4,7 @@ import {Game} from "./Game"
 @Injectable()
 export class GameService {
     private games: Game[] = [];
-    private nextGameId = 1;
+    private nextGameId = 0;
 
 
     createGame(player1: string, player2: string): Game {
@@ -18,6 +18,7 @@ export class GameService {
             winner: null
         };
         this.games.push(newGame);
+        console.log("games ", this.games);
         return newGame;
     }
     findGame(gameId: number): Game | undefined {

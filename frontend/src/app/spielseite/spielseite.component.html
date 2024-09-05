@@ -1,1 +1,18 @@
-<p>spielseite works!</p>
+<body>
+  <div  class="game-container">
+    <button (click)="newGame()">Start new Game</button>
+
+    <div>
+      @if(winner) {
+        <h2>{{winner}} won the game!</h2>
+      }
+    </div>
+
+    <main>
+      @for (val of squares; track $index) {
+        <app-square  (click)="makeMove($index)">
+        </app-square>
+      }
+    </main>
+  </div>
+</body>
