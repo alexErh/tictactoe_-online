@@ -4,7 +4,6 @@ body {
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  background-color: #0a1128;
 }
 
 .game-container {
@@ -24,7 +23,7 @@ main {
 }
 
 app-square {
-  border: 1px gray solid;
+  border: 1px  solid #70747c;
   height: 100px;
   width: 100px;
   display: flex;

@@ -8,8 +8,7 @@ import {NgStyle} from "@angular/common";
     NgStyle
   ],
   template: `
-
-    <button type="button" class="btn btn-warning" [ngStyle]="{'color': getColor()}">{{ squareValue }}</button>
+    <button type="button" class="btn btn-light" [ngStyle]="{'color': getColor()}">{{ squareValue }}</button>
   `,
   styles: [`
     button {
@@ -25,11 +24,11 @@ import {NgStyle} from "@angular/common";
   `]
 })
 export class SquareComponent {
-  @Input() squareValue: 'X' | 'O' | null = 'O';
+  @Input() squareValue: 'X' | 'O' | null = 'X';
 
   getColor(): string {
     if (this.squareValue === 'X') {
-      return '#18b597';
+      return '#007bff';
     } else if (this.squareValue === 'O') {
       return '#e96475';
     } else {
