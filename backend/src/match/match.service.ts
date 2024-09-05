@@ -53,7 +53,7 @@ export class MatchService {
     if (user) {
       return {
         nickname: user.nickname,
-        elo: user.score || 1000,
+        elo: user.score,
         clientId: null,
       };
     }
