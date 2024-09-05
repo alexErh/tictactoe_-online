@@ -6,7 +6,7 @@ import * as session from 'express-session';
 import * as crypto from 'crypto';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
-declare module "express-session" {
+declare module 'express-session' {
   interface SessionData {
     isLoggedIn?: boolean;
     user?: { nickname: string };
@@ -17,8 +17,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
       origin: 'http://localhost:4200',
-      methods: ['GET', 'POST'],
-      allowedHeaders: ['my-custom-header'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
     },
   });

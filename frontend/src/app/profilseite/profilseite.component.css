@@ -1,45 +1,7 @@
-.profile-container {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.profile-header h1 {
-  color: #343a40;
-}
-
-.profile-details {
-  border-bottom: 1px solid #dee2e6;
-  padding-bottom: 20px;
-}
-
-.profile-picture img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-}
-
-.profile-info p {
-  font-size: 16px;
-}
-
-.player-stats h3, .game-history h3, .profile-settings h3 {
-  color: #007bff;
-}
-
-.game-history .list-group-item {
-  background-color: #ffffff;
-}
-
-.profile-settings .btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-}
 .nav {
   background-color: #f8f9fa;
   padding-left: 10px;
   height: 100%;
-
 }
 
 .nav-item {
@@ -74,15 +36,7 @@
   color: #007bff;
 }
 
-.mb-4 {
-  margin-bottom: 20px;
-}
-
-.border {
-  border: 1px solid #dee2e6;
-}
 .nav-link.active {
   background-color: #007bff;
   color: white;
-
 }

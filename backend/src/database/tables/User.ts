@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Buffer } from 'buffer';
 
 @Entity()
 @Unique(['nickname'])

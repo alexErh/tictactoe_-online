@@ -7,7 +7,7 @@ import { catchError, Observable, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class ProfileService {
-  private apiUrl = 'http://localhost:55185/profil';
+  private apiUrl = 'http://localhost:3000/profil';
 
   constructor(private http: HttpClient) { }
 
@@ -29,8 +29,8 @@ export class ProfileService {
     );
   }
 
-  changePassword(newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/change-password`, { password: newPassword }).pipe(
+  changePassword(nickname: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/change-password`, { nickname, password: newPassword }).pipe(
       catchError(error => {
         console.error('Error changing password:', error);
         return throwError(() => new Error('Error changing password'));
@@ -38,9 +38,10 @@ export class ProfileService {
     );
   }
 
-  uploadProfileImage(file: File): Observable<any> {
+  uploadProfileImage(file: File, nickname: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('nickname', nickname);
 
     return this.http.post<any>(`${this.apiUrl}/upload-image`, formData, {
       reportProgress: true,
@@ -49,6 +50,14 @@ export class ProfileService {
       catchError(error => {
         console.error('Error uploading profile image:', error);
         return throwError(() => new Error('Error uploading profile image'));
+      })
+    );
+  }
+  getProfileImage(nickname: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/profile-image/${nickname}`, { responseType: 'blob' }).pipe(
+      catchError(error => {
+        console.error('Error fetching profile image:', error);
+        return throwError(() => new Error('Error fetching profile image'));
       })
     );
   }

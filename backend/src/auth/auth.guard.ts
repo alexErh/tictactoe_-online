@@ -1,14 +1,9 @@
 //Authentifizierung überprüfen (isLoggedIN)
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
-import { SessionData } from "express-session";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { SessionData } from 'express-session';
 import { Request } from 'express';
-import {Reflector} from "@nestjs/core";
-import {IS_PUBLIC_KEY} from "./public.decorator";
-
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -28,5 +23,4 @@ export class AuthGuard implements CanActivate {
     const session: SessionData = request.session;
     return session.isLoggedIn == true;
   }
-
 }
