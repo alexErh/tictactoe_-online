@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from 'src/database/tables/GameEntity';
 import { User } from 'src/database/tables/User';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreateGameDto } from './dto/createGameDto';
 import { UpdateGameDto } from './dto/updateGameDto';
 
@@ -30,13 +30,30 @@ export class GameService {
         });
     }
 
+    async getAllActiveGames(): Promise<GameEntity[]> {
+        return this.gameRepository.find({ where: { 
+            player1: Not(IsNull()),
+            player2: Not(IsNull()),
+            winner: IsNull()
+        }});
+    }
+
+    async getAllFinishedGames(): Promise<GameEntity[]> {
+        return this.gameRepository.find({ where: {
+            player1: Not(IsNull()),
+            player2: Not(IsNull()),
+            winner: Not(IsNull())
+        }})
+    }
+
     async createGame(game: CreateGameDto): Promise<GameEntity> {
-        const gameTable: GameEntity = new GameEntity();
+        const gameEntity: GameEntity = new GameEntity();
 
-        gameTable.player1 = game.player1;
-        gameTable.player2 = game.player2;
+        gameEntity.player1 = game.player1;
+        gameEntity.player2 = game.player2;
+        gameEntity.winner = null;
 
-        return this.gameRepository.save(gameTable);
+        return this.gameRepository.save(gameEntity);
     }
 
     async setWinner(data: UpdateGameDto): Promise<GameEntity> {
