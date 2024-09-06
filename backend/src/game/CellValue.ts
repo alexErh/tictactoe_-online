@@ -1,1 +1,1 @@
-type CellValue = null | 'X' | 'O';
+type CellValue = 'X' | 'O' | null;

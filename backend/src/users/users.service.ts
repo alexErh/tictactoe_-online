@@ -1,72 +1,82 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from 'src/database/tables/User';
-import { CreateUserDto } from "./dto/createUserDto";
+import { CreateUserDto } from './dto/createUserDto';
 import { UpdateUserDto } from './dto/updateUserDto';
 import { InjectRepository } from '@nestjs/typeorm';
 
-
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+  // dummy data for testing
+  // todo replace it with database methods
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
 
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>
-    ){}
-    // dummy data for testing
-    // todo replace it with database methods
-    private readonly users = [
-        {
-            userId: 1,
-            username: 'john',
-            password: 'changeme',
-        },
-        {
-            userId: 2,
-            username: 'maria',
-            password: 'guess',
-        },
-    ];
+  async getAll(): Promise<User[]> {
+    return this.userRepository.find();
+  }
 
-    async getAll(): Promise<User[]> {
-        return this.userRepository.find();
-    }
+  async getOne(nickname: string): Promise<User> {
+    const user: User = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+    if (user) return user;
+    throw new NotFoundException();
+  }
 
-    async getOne(nickname: string): Promise<User> {
-        const user: User = await this.userRepository.findOne({where: { nickname: nickname } });
-        if (user)
-            return user;
-        throw new NotFoundException();
-    }
+  async create(
+    createUserDto: CreateUserDto,
+    file?: Express.Multer.File,
+  ): Promise<User> {
+    const newUser: User = new User();
 
-    async create(createUserDto: CreateUserDto, file?: Express.Multer.File): Promise<User> {
-        const newUser: User = new User();
-        
-        newUser.nickname = createUserDto.nickname;
-        newUser.password = createUserDto.password;
-        if (file)
-            newUser.img = file.buffer;
+    newUser.nickname = createUserDto.nickname;
+    newUser.password = createUserDto.password;
+    if (file) newUser.img = file.buffer;
 
-        const existingUser: User = await this.userRepository.findOne({ where: { nickname: newUser.nickname } });
+    const existingUser: User = await this.userRepository.findOne({
+      where: { nickname: newUser.nickname },
+    });
 
-        if (existingUser)
-            throw new ConflictException('User with this nickname already exists');
+    if (existingUser)
+      throw new ConflictException('User with this nickname already exists');
 
+    const createdUser: User = await this.userRepository.save(newUser);
 
-        const createdUser: User = await this.userRepository.save(newUser);
+    return createdUser;
+  }
 
-        return createdUser;
-    }
+  async update(
+    updateUserDto: UpdateUserDto,
+    file?: Express.Multer.File,
+  ): Promise<User> {
+    const userToUpdate: User = await this.userRepository.findOne({
+      where: { nickname: updateUserDto.nickname },
+    });
 
-    async update(updateUserDto: UpdateUserDto, file?: Express.Multer.File): Promise<User> {
-        const userToUpdate: User = await this.userRepository.findOne({ where: { nickname: updateUserDto.nickname } });
+    if (file) userToUpdate.img = file.buffer;
+    userToUpdate.password = updateUserDto.password;
+    userToUpdate.score = updateUserDto.score;
+    userToUpdate.isAdmin = updateUserDto.isAdmin;
 
-        if (file)
-            userToUpdate.img = file.buffer;
-        userToUpdate.password = updateUserDto.password;
-        userToUpdate.score = updateUserDto.score;
-        userToUpdate.isAdmin = updateUserDto.isAdmin;
-
-        return await this.userRepository.save(userToUpdate);
-    }
+    return await this.userRepository.save(userToUpdate);
+  }
 }
