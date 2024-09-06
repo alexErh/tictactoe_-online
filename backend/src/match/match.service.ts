@@ -16,7 +16,7 @@ export class MatchService {
 
   //Sucht in der Datenbank (über UsersService) nach dem Benutzer.
   async identify(user: string, clientId: string) {
-    const existingUser = await this.userService.findUserByNickname(user);
+    const existingUser = await this.userService.getOne(user);
     if (existingUser) {
       console.log(
         `User identified: ${existingUser.nickname} with client ID: ${clientId}`,
@@ -49,7 +49,7 @@ export class MatchService {
   }
 
   async getPlayerData(nickname: string): Promise<Player | null> {
-    const user = await this.userService.findUserByNickname(nickname);
+    const user = await this.userService.getOne(nickname);
     if (user) {
       return {
         nickname: user.nickname,

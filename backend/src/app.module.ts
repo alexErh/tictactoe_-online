@@ -28,7 +28,7 @@ import { GameEntity } from './database/tables/GameEntity';
     UsersModule,
     GameModule,
   ],
-  controllers: [AppController, GameController],
+  controllers: [AppController],
   providers: [AppService, MatchGateway, MatchService],
 })
 export class AppModule {}
