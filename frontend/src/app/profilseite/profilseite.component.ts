@@ -1,10 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '../services/profile.service';
-import { NgClass } from '@angular/common';
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet,  } from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
 import { NavigationComponent } from '../navigation/navigation.component';
+import { catchError, fromEvent, map, Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-profilseite',
@@ -16,6 +17,7 @@ import { NavigationComponent } from '../navigation/navigation.component';
     RouterLink,
     RouterLinkActive,
     NavigationComponent,
+    NgOptimizedImage,
   ],
   templateUrl: './profilseite.component.html',
   styleUrls: ['./profilseite.component.css'],
@@ -31,10 +33,13 @@ export class ProfilseiteComponent implements OnInit {
   isStatsLoaded: boolean = false;
   isHistoryLoaded: boolean = false;
   isSettingsLoaded: boolean = false;
+  profileImage$: Observable<string>;
+
 
   public profileService: ProfileService = inject(ProfileService);
 
   constructor(private fb: FormBuilder) {
+    this.profileImage$ = new Observable<string>();
     this.profileForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
       file: [null],
@@ -44,6 +49,8 @@ export class ProfilseiteComponent implements OnInit {
   ngOnInit() {
     this.loadPlayerStats();
     this.loadGameHistory();
+    this.loadProfileImage(this.playerStats.nickname);
+
   }
 
   loadPlayerStats() {
@@ -62,13 +69,22 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   loadProfileImage(nickname: string) {
-    this.profileService.getProfileImage(nickname).subscribe(blob => {
-      this.profileImage = URL.createObjectURL(blob);
-    }, error => {
-      console.error('Error loading profile image:', error);
-      this.profileImage = this.defaultProfileImage;
-    });
+    this.profileImage$ = this.profileService.getProfileImage(nickname).pipe(
+      switchMap(blob => {
+        const reader = new FileReader();
+        const fileRead$ = fromEvent(reader, 'load').pipe(
+          map(() => reader.result as string)
+        );
+        reader.readAsDataURL(blob);
+        return fileRead$;
+      }),
+      catchError(error => {
+        console.error('Error loading profile image:', error);
+        return of(this.defaultProfileImage);
+      })
+    );
   }
+
 
   loadGameHistory() {
     this.profileService.getGameHistory().subscribe({
@@ -156,7 +172,4 @@ export class ProfilseiteComponent implements OnInit {
     }
   }
 
-  trackGameById(index: number, game: any): number {
-    return game.id;
-  }
 }

@@ -10,8 +10,9 @@
         <div class="row profile-details mb-4 align-items-center justify-content-start mt-5">
           <div class="col-md-4 d-flex justify-content-center">
             <div class="profile-picture">
-              <img [src]="profileImage || defaultProfileImage" alt="Profilbild" class="img-fluid rounded-circle" />
+              <img ngSrc="{{ profileImage || defaultProfileImage }}" alt="Profilbild" class="img-fluid rounded-circle" width="200" height="200"/>
             </div>
+
           </div>
           <div class="col-md-8">
             <div class="profile-info text-start">
@@ -22,8 +23,7 @@
         </div>
 
         <!-- Accordion für die Abschnitte -->
-        <div class="accordion" id="accordionFlushExample" style="max-width: 700px;">
-
+        <div class="accordion" id="accordionFlushExample">
           <!-- Spielerstatistik -->
           <div class="accordion-item">
             <h2 class="accordion-header" id="flush-headingStats">
@@ -34,7 +34,7 @@
             <div id="flush-collapseStats" class="accordion-collapse collapse" [ngClass]="{'show': isStatsLoaded}" aria-labelledby="flush-headingStats" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
                 <p>Gewonnene Spiele: {{ playerStats?.wins }}-mal</p>
-                <p>Verlorene Spiele: {{ playerStats?.losses }}-mal </p>
+                <p>Verlorene Spiele: {{ playerStats?.losses }}-mal</p>
               </div>
             </div>
           </div>
@@ -49,11 +49,13 @@
             <div id="flush-collapseHistory" class="accordion-collapse collapse" [ngClass]="{'show': isHistoryLoaded}" aria-labelledby="flush-headingHistory" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
                 <ul class="list-group">
-                  <li *ngFor="let game of gameHistory; trackBy: trackGameById" class="list-group-item">
-                    <p>Spiel Nr.: {{ game.id}}</p>
-                    <p>Gegner: {{ game.player1 || game.player2}}</p>
-                    <p>Gewinner: {{ game.winner || 'Keiner' }}</p>
-                  </li>
+                  @for (game of gameHistory; track game) {
+                    <li class="list-group-item">
+                      <p>Spiel Nr.: {{ game.id }}</p>
+                      <p>Gegner: {{ game.player1 || game.player2 }}</p>
+                      <p>Gewinner: {{ game.winner || 'Keiner' }}</p>
+                    </li>
+                  }
                 </ul>
               </div>
             </div>
@@ -74,12 +76,14 @@
                     <label for="password" class="form-label">Neues Passwort:</label>
                     <input id="password" formControlName="password" type="password" class="form-control" />
                   </div>
-                  <button type="submit" class="btn btn-success" [disabled]="profileForm.invalid">Passwort ändern</button>
+                  <button type="submit" class="btn btn-danger" [disabled]="profileForm.invalid">Passwort ändern</button>
                 </form>
 
-                <h3 class="text-primary mt-4">Profilbild aktualisieren</h3>
+                <h3 class="mt-4">Profilbild aktualisieren</h3>
                 <input type="file" (change)="onFileChange($event)" class="form-control" />
-                <p *ngIf="uploadProgress > 0" class="mt-2">Upload-Fortschritt: {{ uploadProgress }}%</p>
+                @if (uploadProgress > 0) {
+                  <p class="mt-2">Upload-Fortschritt: {{ uploadProgress }}%</p>
+                }
               </div>
             </div>
           </div>

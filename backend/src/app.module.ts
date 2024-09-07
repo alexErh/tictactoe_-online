@@ -7,7 +7,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MatchGateway } from './match/match.gateway';
 import { MatchService } from './match/match.service';
-import { MatchmakingController } from './match/matchmaking/matchmaking.controller';
 import { User } from './database/tables/User';
 import { Game } from './database/tables/Game';
 
@@ -26,7 +25,7 @@ import { Game } from './database/tables/Game';
     UsersModule,
     ProfileModule,
   ],
-  controllers: [AppController, MatchmakingController],
+  controllers: [AppController],
   providers: [AppService, MatchGateway, MatchService],
 })
 export class AppModule {}

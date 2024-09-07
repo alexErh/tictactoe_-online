@@ -24,6 +24,7 @@ export class User {
   @ApiProperty({ example: [] })
   @Column({
     type: 'blob',
+    nullable: true,
   })
   img: Buffer;
 }
