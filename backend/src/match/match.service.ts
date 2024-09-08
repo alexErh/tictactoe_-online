@@ -1,5 +1,5 @@
 //Logik des Matchmaking: 1.finden von Gegner 2.warteschlange verwalten
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 
 export interface Player {
@@ -14,7 +14,6 @@ export class MatchService {
 
   constructor(private userService: UsersService) {}
 
-  //Sucht in der Datenbank (über UsersService) nach dem Benutzer.
   async identify(user: string, clientId: string) {
     const existingUser = await this.userService.findUserByNickname(user);
     if (existingUser) {

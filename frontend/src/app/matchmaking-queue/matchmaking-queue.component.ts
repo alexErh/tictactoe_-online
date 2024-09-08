@@ -42,7 +42,6 @@ export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
   }
 
   joinQueue() {
-//ändern
     const playerData = { nickname: 'Player1', elo: 1200 };
     this.waiting = true;
     this.matchmakingQueueService.joinQueue(playerData);
