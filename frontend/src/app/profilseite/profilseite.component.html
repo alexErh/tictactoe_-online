@@ -51,8 +51,8 @@
                 <ul class="list-group">
                   @for (game of gameHistory; track game) {
                     <li class="list-group-item">
-                      <p>Spiel Nr.: {{ game.id }}</p>
-                      <p>Gegner: {{ game.player1 || game.player2 }}</p>
+                      <p>Spieler 1: {{ game.player1 }}</p>
+                      <p>Spieler 2: {{ game.player2 }}</p>
                       <p>Gewinner: {{ game.winner || 'Keiner' }}</p>
                     </li>
                   }

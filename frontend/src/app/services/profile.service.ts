@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
-
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
   private apiUrl = 'http://localhost:3000/profil';
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   getPlayerStats(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/stats`).pipe(
+    const nickname = this.authService.getCurrentUser().nickname; // Holen Sie sich den Nickname des aktuellen Benutzers
+    return this.http.get<any>(`${this.apiUrl}/stats/${nickname}`).pipe(
       catchError(error => {
         console.error('Error fetching player stats:', error);
         return throwError(() => new Error('Error fetching player stats'));
@@ -21,7 +21,8 @@ export class ProfileService {
   }
 
   getGameHistory(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/history`).pipe(
+    const nickname = this.authService.getCurrentUser().nickname;
+    return this.http.get<any[]>(`${this.apiUrl}/history/${nickname}`).pipe(
       catchError(error => {
         console.error('Error fetching game history:', error);
         return throwError(() => new Error('Error fetching game history'));
@@ -29,8 +30,27 @@ export class ProfileService {
     );
   }
 
-  changePassword(nickname: string, newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/change-password`, { nickname, password: newPassword }).pipe(
+  getGameStatistics(): Observable<{ wins: number; losses: number }> {
+    const nickname = this.authService.getCurrentUser().nickname;
+    return this.http.get<{ wins: number; losses: number }>(`${this.apiUrl}/statistics/${nickname}`).pipe(
+      catchError(error => {
+        console.error('Error fetching game statistics:', error);
+        return throwError(() => new Error('Error fetching game statistics'));
+      })
+    );
+  }
+
+  getProfileImage(nickname: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/profile-image/${nickname}`, { responseType: 'blob' }).pipe(
+      catchError(error => {
+        console.error('Error fetching profile image:', error);
+        return throwError(() => new Error('Error fetching profile image'));
+      })
+    );
+  }
+
+  changePassword(newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/change-password`, { password: newPassword }).pipe(
       catchError(error => {
         console.error('Error changing password:', error);
         return throwError(() => new Error('Error changing password'));
@@ -38,11 +58,7 @@ export class ProfileService {
     );
   }
 
-  uploadProfileImage(file: File, nickname: string): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('nickname', nickname);
-
+  uploadProfileImage(formData: FormData): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/upload-image`, formData, {
       reportProgress: true,
       observe: 'events'
@@ -53,12 +69,5 @@ export class ProfileService {
       })
     );
   }
-  getProfileImage(nickname: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/profile-image/${nickname}`, { responseType: 'blob' }).pipe(
-      catchError(error => {
-        console.error('Error fetching profile image:', error);
-        return throwError(() => new Error('Error fetching profile image'));
-      })
-    );
-  }
+
 }

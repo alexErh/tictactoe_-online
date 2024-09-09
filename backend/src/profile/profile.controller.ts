@@ -15,9 +15,8 @@ import {
 import { ProfileService } from './profile.service';
 import { Response, Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
-import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDto } from './change-password.dto';
-import { SessionData } from 'express-session';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Profil')
@@ -27,27 +26,56 @@ export class ProfileController {
 
   @Get('stats')
   @UseGuards(AuthGuard)
-  @ApiQuery({ name: 'nickname', type: String, description: 'User nickname' })
-  async getPlayerStats(@Query('nickname') nickname: string) {
+  async getPlayerStats(@Req() req: Request) {
+    const nickname = req.session?.user?.nickname;
+    if (!nickname) {
+      throw new HttpException(
+        'Benutzer nicht angemeldet',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return await this.profileService.getPlayerStats(nickname);
   }
 
   @Get('history')
   @UseGuards(AuthGuard)
-  @ApiQuery({ name: 'nickname', type: String, description: 'User nickname' })
-  async getGameHistory(@Query('nickname') nickname: string) {
+  async getGameHistory(@Req() req: Request) {
+    const nickname = req.session?.user?.nickname;
+    if (!nickname) {
+      throw new HttpException(
+        'Benutzer nicht angemeldet',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return await this.profileService.getGameHistory(nickname);
+  }
+
+  @Get('statistics')
+  @UseGuards(AuthGuard)
+  async getGameStatistics(
+    @Req() req: Request,
+  ): Promise<{ wins: number; losses: number }> {
+    const nickname = req.session?.user?.nickname;
+    return this.profileService.getGameStatistics(nickname);
   }
 
   @Post('change-password')
   @ApiBody({ type: ChangePasswordDto })
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    const nickname = req.session?.user?.nickname;
+    if (!nickname) {
+      throw new HttpException(
+        'Benutzer nicht angemeldet',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     try {
       const message = await this.profileService.changePassword(
-        changePasswordDto.nickname,
+        nickname,
         changePasswordDto.password,
       );
       return res.status(HttpStatus.OK).send(message);
@@ -64,21 +92,23 @@ export class ProfileController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: Request & { session: SessionData },
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    const nickname = req.session?.user?.nickname;
+    if (!nickname) {
+      throw new HttpException(
+        'Benutzer nicht angemeldet',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     try {
       if (!file) {
         throw new Error('Kein Bild hochgeladen');
       }
 
-      const currentUser = req.session?.user;
-      if (!currentUser) {
-        throw new Error('Nicht autorisiert');
-      }
-
       const message = await this.profileService.saveProfileImage(
-        currentUser.nickname,
+        nickname,
         file,
       );
       return res.status(200).send(message);
@@ -89,7 +119,6 @@ export class ProfileController {
 
   @Get('profile-image')
   @UseGuards(AuthGuard)
-  @ApiQuery({ name: 'nickname', type: String, description: 'User nickname' })
   async getProfileImage(
     @Query('nickname') nickname: string,
     @Res() res: Response,

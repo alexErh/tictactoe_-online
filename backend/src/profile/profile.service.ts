@@ -44,6 +44,27 @@ export class ProfileService {
       );
     }
   }
+
+  async getGameStatistics(nickname: string) {
+    try {
+      const games = await this.gameRepository.find({
+        where: [{ player1: nickname }, { player2: nickname }],
+      });
+
+      const wins = games.filter((game) => game.winner === nickname).length;
+      const losses = games.filter(
+        (game) => game.winner && game.winner !== nickname,
+      ).length;
+
+      return { wins, losses };
+    } catch (error) {
+      throw new HttpException(
+        'Fehler beim Abrufen der Spielstatistik',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async changePassword(nickname: string, newPassword: string) {
     try {
       const user = await this.userRepository.findOne({ where: { nickname } });
@@ -78,7 +99,9 @@ export class ProfileService {
           HttpStatus.NOT_FOUND,
         );
       }
-      user.img = file.buffer;
+      if (file.buffer instanceof Buffer) {
+        user.img = file.buffer;
+      }
       await this.userRepository.save(user);
       return 'Bild erfolgreich gespeichert';
     } catch (error) {
