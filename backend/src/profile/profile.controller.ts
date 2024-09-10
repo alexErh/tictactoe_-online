@@ -87,6 +87,7 @@ export class ProfileController {
     }
   }
 
+
   @Post('upload-image')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))

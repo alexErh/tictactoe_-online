@@ -151,7 +151,7 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   onPasswordChange() {
-    if (this.profileForm.valid && this.playerStats?.nickname) {
+    if (this.profileForm.valid) {
       this.profileService.changePassword(this.profileForm.value.password).subscribe({
         next: () => {
           alert('Passwort erfolgreich geändert');
@@ -163,9 +163,10 @@ export class ProfilseiteComponent implements OnInit {
         }
       });
     } else {
-      alert('Nickname ist nicht verfügbar.');
+      alert('Das Formular ist ungültig.');
     }
   }
+
 
   onFileChange(event: any) {
     const file = event.target.files[0];
