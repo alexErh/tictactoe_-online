@@ -7,6 +7,7 @@ import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  // ob eine Route als öffentlich gekennzeichnet
   constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -14,6 +15,7 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+    // ob die Route als öffentlich markiert ist, wird der Zugriff ohne weitere Überprüfungen erlaubt
     if (isPublic) {
       // 💡 See this condition
       return true;

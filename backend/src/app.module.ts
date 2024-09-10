@@ -10,9 +10,14 @@ import { MatchGateway } from './match/match.gateway';
 import { MatchService } from './match/match.service';
 import { User } from './database/tables/User';
 import { Game } from './database/tables/Game';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend', 'browser'),
+    }),
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './tmp.sqlite',

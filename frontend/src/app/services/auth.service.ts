@@ -9,14 +9,6 @@ export class AuthService {
 
   constructor() {}
 
-  getCurrentUser(): { nickname: string; isAdmin: boolean } {
-    if (this.user.isLoggedIn) {
-      return { nickname: this.user.nickname, isAdmin: this.user.isAdmin };
-    } else {
-      throw new Error('No user is currently logged in.');
-    }
-  }
-
   isAdmin(): boolean {
     return this.user.isAdmin;
   }
