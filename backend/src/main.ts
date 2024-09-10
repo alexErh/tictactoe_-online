@@ -9,7 +9,10 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 declare module 'express-session' {
   interface SessionData {
     isLoggedIn?: boolean;
-    user?: { nickname: string };
+    user?: {
+      nickname: string;
+      isAdmin: boolean;
+    };
   }
 }
 

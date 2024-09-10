@@ -1,4 +1,3 @@
-//Auth Logik, überprüft Benutzeranmeldeinformationen, setzt eine Sitzung des Benutzers
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { SessionData } from 'express-session';
@@ -13,12 +12,13 @@ export class AuthService {
     session: SessionData,
   ): Promise<void> {
     const user = await this.usersService.getOne(nickname);
-    console.log('user', user);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+
+    if (!user || user.password !== pass) {
+      throw new UnauthorizedException('Ungültige Anmeldeinformationen');
     }
+
     session.isLoggedIn = true;
-    session.user = { nickname: user.nickname };
+    session.user = { nickname: user.nickname, isAdmin: user.isAdmin || false };
   }
 
   signOut(session: SessionData): void {

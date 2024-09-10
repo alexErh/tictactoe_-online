@@ -1,3 +1,4 @@
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
@@ -5,7 +6,8 @@ import { MatchmakingQueueComponent } from './matchmaking-queue/matchmaking-queue
 import { SpielseiteComponent } from './spielseite/spielseite.component';
 import { ProfilseiteComponent } from './profilseite/profilseite.component';
 import { StartseiteComponent } from './startseite/startseite.component';
-import { NgModule } from '@angular/core';
+import { AdminComponent } from './admin/admin.component';
+import { AdminGuard } from './admin/admin.guard';
 
 export const routes: Routes = [
   { path: 'register', component: RegistrationComponent },
@@ -14,13 +16,12 @@ export const routes: Routes = [
   { path: 'matchmaking', component: MatchmakingQueueComponent },
   { path: 'game', component: SpielseiteComponent },
   { path: 'profil', component: ProfilseiteComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {
-
-}
+export class AppRoutingModule {}
