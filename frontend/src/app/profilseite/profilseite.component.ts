@@ -110,7 +110,7 @@ export class ProfilseiteComponent implements OnInit {
 
   loadProfileImage() {
     if (this.playerStats?.nickname) {
-      this.profileImage$ = this.profileService.getProfileImage(this.playerStats.nickname).pipe(
+      this.profileImage$ = this.profileService.getProfileImage().pipe(
         switchMap((blob) => {
           const reader = new FileReader();
           return new Observable<string>(observer => {

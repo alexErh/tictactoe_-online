@@ -36,19 +36,20 @@ export class ProfileService {
     );
   }
 
-  getProfileImage(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/profile-image`, { responseType: 'blob' }).pipe(
-      catchError(error => {
-        console.error('Error fetching profile image:', error);
-        return throwError(() => new Error('Error fetching profile image'));
-      })
-    );
-  }
   changePassword(newPassword: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/change-password`, { password: newPassword }).pipe(
       catchError(error => {
         console.error('Error changing password:', error);
         return throwError(() => new Error('Error changing password'));
+      })
+    );
+  }
+
+  getProfileImage(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/profile-image`, { responseType: 'blob' }).pipe(
+      catchError(error => {
+        console.error('Error fetching profile image:', error);
+        return throwError(() => new Error('Error fetching profile image'));
       })
     );
   }

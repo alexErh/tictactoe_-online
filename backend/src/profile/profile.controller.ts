@@ -13,11 +13,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response, Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDto } from './change-password.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Profil')
 @Controller('profil')
@@ -90,7 +90,7 @@ export class ProfileController {
   @Post('upload-image')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
+  async saveProfileImage(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
     @Res() res: Response,

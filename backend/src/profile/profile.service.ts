@@ -86,6 +86,7 @@ export class ProfileService {
       );
     }
   }
+
   async saveProfileImage(
     nickname: string,
     file: Express.Multer.File,
