@@ -79,11 +79,10 @@
                   <button type="submit" class="btn btn-danger" [disabled]="profileForm.invalid">Passwort ändern</button>
                 </form>
 
+
                 <h3 class="mt-4">Profilbild aktualisieren</h3>
                 <input type="file" (change)="onFileChange($event)" class="form-control" />
-                @if (uploadProgress > 0) {
-                  <p class="mt-2">Upload-Fortschritt: {{ uploadProgress }}%</p>
-                }
+
               </div>
             </div>
           </div>

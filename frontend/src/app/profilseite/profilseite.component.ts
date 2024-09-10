@@ -171,25 +171,20 @@ export class ProfilseiteComponent implements OnInit {
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {
+      // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
       const formData = new FormData();
       formData.append('file', file);
 
-      this.uploadProgress = 0;
       this.profileService.uploadProfileImage(formData).subscribe({
-        next: (event) => {
-          if (event.type === HttpEventType.UploadProgress) {
-            this.uploadProgress = Math.round((100 * event.loaded) / (event.total || 1));
-          } else if (event.type === HttpEventType.Response) {
-            alert('Profilbild erfolgreich hochgeladen!');
-            this.uploadProgress = 100;
-          }
+        next: () => {
+          alert('Profilbild erfolgreich hochgeladen!');
         },
         error: (error) => {
           console.error('Error uploading profile image:', error);
           alert('Fehler beim Hochladen des Profilbilds.');
-          this.uploadProgress = 0;
         },
       });
     }
   }
 }
+
