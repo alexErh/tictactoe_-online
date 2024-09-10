@@ -12,31 +12,12 @@ import { readFileSync } from 'fs';
 
 @Injectable()
 export class UsersService {
-  avatar_placeholder_path: string = 'src/assets/avatar_placeholder.jpeg';
+  avatar_placeholder_path: string = 'src/assets/portrait.jpg';
 
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  // Dummy data for testing
-  // TODO: Replace it with database methods
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-    {
-      userId: 3,
-      username: 'Dunia',
-      password: 'Dunia',
-    },
-  ];
 
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
@@ -52,15 +33,15 @@ export class UsersService {
     throw new NotFoundException();
   }
 
-  async create(
-    createUserDto: CreateUserDto,
-    img?: Express.Multer.File,
-  ): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const newUser: User = new User();
 
     newUser.nickname = createUserDto.nickname;
     newUser.password = createUserDto.password;
-    newUser.img = img ? img.buffer : readFileSync(this.avatar_placeholder_path); // Saving avatar placeholder if image wasn't uploaded
+
+    newUser.score = 1000;
+    newUser.isAdmin = false;
+    newUser.img = readFileSync(this.avatar_placeholder_path);
 
     const existingUser: User = await this.userRepository.findOne({
       where: { nickname: newUser.nickname },
@@ -98,9 +79,5 @@ export class UsersService {
     userToUpdate.isAdmin = updateUserDto.isAdmin;
 
     return await this.userRepository.save(userToUpdate);
-  }
-
-  async findUserByNickname(nickname: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { nickname } });
   }
 }

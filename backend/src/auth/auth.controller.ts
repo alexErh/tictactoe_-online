@@ -33,6 +33,7 @@ export class AuthController {
     return { message: 'Login successful' };
   }
 
+  // in Frontend verwenden - Navigation wenn der Nutzer aufs Abmeldebutton clickt
   @Post('logout')
   logout(@Session() session: SessionData) {
     this.authService.signOut(session);

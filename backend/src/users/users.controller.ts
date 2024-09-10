@@ -19,6 +19,7 @@ import { Public } from 'src/auth/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // für Admin gedacht, um alle useres anzusehen
   @Get()
   @ApiResponse({ type: [User] })
   async getAll(): Promise<User[]> {
@@ -30,14 +31,11 @@ export class UsersController {
   async getOne(@Param('nickname') nickname: string): Promise<User> {
     return await this.usersService.getOne(nickname);
   }
-
+  //Registrierung eines neuen Users
   @Public()
   @Post('signup')
   @ApiResponse({ type: User })
-  async create(
-    @Body() createUserDto: CreateUserDto,
-    @UploadedFile() img: Express.Multer.File,
-  ): Promise<User> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return await this.usersService.create(createUserDto);
   }
 

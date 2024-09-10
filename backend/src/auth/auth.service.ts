@@ -18,6 +18,7 @@ export class AuthService {
     }
 
     session.isLoggedIn = true;
+    //in anderen Stellen (session.user.isAdmin) prüfen, ob der Nutzer die entsprechenden Rechte für einen Admin-Bereich hat.
     session.user = { nickname: user.nickname, isAdmin: user.isAdmin || false };
   }
 
