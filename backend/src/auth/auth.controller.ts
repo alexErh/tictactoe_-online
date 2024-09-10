@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
   Session,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -40,7 +39,7 @@ export class AuthController {
     return { message: 'Logout successful' };
   }
 
-  @Get('profile')
+  @Get('isloggedIn')
   getProfile(@Session() session: SessionData) {
     if (!session.isLoggedIn) {
       throw new UnauthorizedException('You are not logged in');
