@@ -33,8 +33,15 @@ export class ProfileService {
 
   async getGameHistory(nickname: string) {
     try {
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
+      if (!user) {
+        throw new HttpException('Nutzer nicht gefunden', HttpStatus.NOT_FOUND);
+      }
+
       const history = await this.gameRepository.find({
-        where: [{ player1: nickname }, { player2: nickname }],
+        where: [{ player1: user }, { player2: user }],
       });
       return history;
     } catch (error) {
@@ -47,13 +54,20 @@ export class ProfileService {
 
   async getGameStatistics(nickname: string) {
     try {
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
+      if (!user) {
+        throw new HttpException('Nutzer nicht gefunden', HttpStatus.NOT_FOUND);
+      }
+
       const games = await this.gameRepository.find({
-        where: [{ player1: nickname }, { player2: nickname }],
+        where: [{ player1: user }, { player2: user }],
       });
 
-      const wins = games.filter((game) => game.winner === nickname).length;
+      const wins = games.filter((game) => game.winner === user.nickname).length;
       const losses = games.filter(
-        (game) => game.winner && game.winner !== nickname,
+        (game) => game.winner && game.winner !== user.nickname,
       ).length;
 
       return { wins, losses };
@@ -67,7 +81,9 @@ export class ProfileService {
 
   async changePassword(nickname: string, newPassword: string) {
     try {
-      const user = await this.userRepository.findOne({ where: { nickname } });
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
 
       if (user) {
         user.password = newPassword;
@@ -92,7 +108,9 @@ export class ProfileService {
     file: Express.Multer.File,
   ): Promise<string> {
     try {
-      const user = await this.userRepository.findOne({ where: { nickname } });
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
 
       if (!user) {
         throw new HttpException(
@@ -115,7 +133,9 @@ export class ProfileService {
 
   async getProfileImage(nickname: string): Promise<Buffer> {
     try {
-      const user = await this.userRepository.findOne({ where: { nickname } });
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
       if (!user || !user.img) {
         throw new HttpException('Bild nicht gefunden', HttpStatus.NOT_FOUND);
       }

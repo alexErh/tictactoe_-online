@@ -1,15 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from './User';
 
 @Entity()
 export class Game {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  player1: string;
+  @ManyToOne(() => User, { eager: true })
+  player1: User;
 
-  @Column()
-  player2: string;
+  @ManyToOne(() => User, { eager: true })
+  player2: User;
 
   @Column('json')
   board: any;

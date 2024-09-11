@@ -1,28 +1,28 @@
-<div class="container text-center">
-  <h1>Ergebnis des Spiels</h1>
+<div class="container-fluid">
+  <div class="row justify-content-center m-4">
+    <app-navigation class="col-md-3 bg-light vh-100 d-flex flex-column"></app-navigation>
 
-  <!-- Anzeige des Spielergebnisses -->
-  <div *ngIf="winner; else tie">
-    <h2>Gewinner: {{ winner }}</h2>
-  </div>
-  <ng-template #tie>
-    <h2>Das Spiel endete unentschieden!</h2>
-  </ng-template>
+    <main class="col-md-9">
+      <div class="container text-center" style="max-width: 800px; margin: auto; padding-top: 20px; padding-bottom: 20px;">
+        <h1>Das Spiel ist zu Ende</h1>
+        <h2>🎉🎉 {{ winner }} hat gewonnen 🎉🎉</h2>
+        <div class="player-info mt-4">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>{{ player1?.nickname }}</h3>
+              <p>Scores: {{ player1?.score }}</p>
+            </div>
+            <div class="col-md-6">
+              <h3>{{ player2?.nickname }}</h3>
+              <p>Scores: {{ player2?.score }}</p>
+            </div>
+          </div>
+        </div>
 
-  <!-- Aktualisierte Elo-Zahlen -->
-  <div class="player-info">
-    <div class="row">
-      <div class="col-md-6">
-        <h3>Spieler X</h3>
-        <p>Aktualisierte Elo-Zahl: {{ playerX.eloRating }}</p>
+        <div class="mt-4">
+          <button class="btn btn-danger" (click)="playAgain()">Spiele nochmal</button>
+        </div>
       </div>
-      <div class="col-md-6">
-        <h3>Spieler O</h3>
-        <p>Aktualisierte Elo-Zahl: {{ playerO.eloRating }}</p>
-      </div>
-    </div>
+    </main>
   </div>
-
-  <!-- Schaltfläche zum Zurückkehren zur Startseite -->
-  <button class="btn btn-primary mt-4" (click)="backToHome()">Zurück zur Startseite</button>
 </div>

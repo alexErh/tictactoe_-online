@@ -1,10 +1,12 @@
-import {IsArray, IsString} from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class FinalStatusDto {
+  @IsArray()
+  board: CellValue[];
 
-    @IsArray()
-    board: CellValue[];
+  @IsString()
+  winner: string;
 
-    @IsString()
-    winner: string;
+  @IsNumber()
+  id?: number;
 }

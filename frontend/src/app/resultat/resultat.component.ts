@@ -1,36 +1,45 @@
-import { Component } from '@angular/core';
-import {Router} from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { GameEndedService } from '../services/game-ended.service';
+import { ResultService } from '../services/result.service';
+import { Router } from '@angular/router';
+import { NavigationComponent } from '../navigation/navigation.component';
 
 @Component({
   selector: 'app-resultat',
-  standalone: true,
-  imports: [],
   templateUrl: './resultat.component.html',
-  styleUrl: './resultat.component.css'
+  standalone: true,
+  styleUrls: ['./resultat.component.css'],
+  imports: [
+    NavigationComponent,
+  ],
 })
-export class ResultatComponent {
-  playerX = { eloRating: 1500, kFactor: 30 }; // Sample initial Elo rating
-  playerO = { eloRating: 1500, kFactor: 30 }; // Sample initial Elo rating
-  winner: string | null = null;
+export class ResultatComponent implements OnInit {
+  winner: string = '';
+  player1: any;
+  player2: any;
+  gameId: number = 0;
 
-  constructor(private router: Router) {
-    // Simulate setting the winner and calculating Elo for demo purposes
-    this.winner = 'X'; // Or 'O' or null if it's a draw
-    this.calculateElo();
+  constructor(
+    private router: Router,
+    private gameSocketService: GameEndedService,
+    private resultService: ResultService,
+) {}
+
+  ngOnInit(): void {
+    this.gameSocketService.gameEnded$.subscribe(gameId => {
+      this.gameId = gameId;
+      this.loadGameDetails();
+    });
   }
 
-  calculateElo(): void {
-    const result = this.winner === 'X' ? 1 : this.winner === 'O' ? 0 : 0.5;
-
-    // Calculate expected scores
-    const expectedScoreX = 1 / (1 + Math.pow(10, (this.playerO.eloRating - this.playerX.eloRating) / 400));
-    const expectedScoreO = 1 / (1 + Math.pow(10, (this.playerX.eloRating - this.playerO.eloRating) / 400));
-
-    // Update Elo ratings
-    this.playerX.eloRating = this.playerX.eloRating + this.playerX.kFactor * (result - expectedScoreX);
-    this.playerO.eloRating = this.playerO.eloRating + this.playerO.kFactor * ((1 - result) - expectedScoreO);
+  loadGameDetails(): void {
+    this.resultService.getGameDetails(this.gameId).subscribe(game => {
+      this.player1 = game.player1;
+      this.player2 = game.player2;
+      this.winner = game.winner ? game.winner.nickname : 'Kein Gewinner';
+    });
   }
-  backToHome(): void {
-    this.router.navigate(['/home']);
+  playAgain(): void {
+    this.router.navigate(['/matchmaking']);
   }
 }

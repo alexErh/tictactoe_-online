@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import {Router} from "@angular/router";
+import { NavigationComponent } from '../navigation/navigation.component';
 
 @Component({
   selector: 'app-startseite',
   standalone: true,
-  imports: [],
+  imports: [
+    NavigationComponent,
+  ],
   templateUrl: './startseite.component.html',
   styleUrl: './startseite.component.css'
 })
