@@ -1,68 +1,79 @@
 //Logik des Matchmaking: 1.finden von Gegner 2.warteschlange verwalten
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-
-export interface Player {
-  nickname: string;
-  elo: number;
-  clientId?: string;
-}
+import { GameService } from 'src/game/game.service';
+import { PlayerDto } from 'src/users/dto/playerDto';
+import { GameStatusDto } from 'src/game/dto/gameStatusDto';
+import { QueueEntityDto } from './dto/queueEntityDto';
+import { ReturnQueueEntityDto } from './dto/returnQueueEntityDto';
 
 @Injectable()
 export class MatchService {
-  private playersQueue: Player[] = [];
 
-  constructor(private userService: UsersService) {}
+  private waitingQueue: QueueEntityDto[] = [];
 
-  //Sucht in der Datenbank (über UsersService) nach dem Benutzer.
-  async identify(user: string, clientId: string) {
-    const existingUser = await this.userService.getOne(user);
-    if (existingUser) {
-      console.log(
-        `User identified: ${existingUser.nickname} with client ID: ${clientId}`,
-      );
+  constructor(
+    private readonly userService: UsersService,
+    private readonly gameService: GameService
+  ) {}
+
+  async joinPlayersQueue(clientId: string, nickname: string): Promise<GameStatusDto | string> {
+    const player2 = await this.userService.getOne(nickname);
+    if (!player2)
+      return `User ${nickname} not found.`
+
+    const suitablePlayer = this.waitingQueue.find(
+      e => Math.abs(e.userScore - player2.score) < 200
+    );
+
+    const gameStatus = new GameStatusDto();
+
+    if (suitablePlayer) {
+
+      gameStatus.nextPlayer = Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
+
+      this.leaveQueue(suitablePlayer.clientId);
+
+      const player_1: PlayerDto = {
+        clientId: suitablePlayer.clientId,
+        nickname: suitablePlayer.userNickname,
+        score: suitablePlayer.userScore,
+        symbol: gameStatus.nextPlayer === suitablePlayer.userNickname ? 'X' : 'O'
+      }
+
+      const player_2: PlayerDto = {
+        clientId: clientId,
+        nickname: player2.nickname,
+        score: player2.score,
+        symbol: gameStatus.nextPlayer === player2.nickname ? 'X' : 'O'
+      }
+      
+      gameStatus.player1 = player_1;
+      gameStatus.player2 = player_2;
+      return gameStatus;
     } else {
-      console.log(`User not found: ${user}`);
+      const e: QueueEntityDto = new QueueEntityDto();
+      e.clientId = clientId;
+      e.userNickname = player2.nickname;
+      e.userScore = player2.score;
+      this.waitingQueue.push(e);
+      return null;
     }
+    
   }
 
-  async findMatch(playerData: Player): Promise<Player | null> {
-    const suitableOpponent = this.playersQueue.find(
-      (player) => Math.abs(player.elo - playerData.elo) < 200,
-    );
-    //Wenn ein geeigneter Gegner gefunden wird, entfernt sie diesen aus der Warteschlange und gibt ihn zurück.
-    if (suitableOpponent) {
-      this.playersQueue = this.playersQueue.filter(
-        (player) => player.clientId !== suitableOpponent.clientId,
-      );
-      return suitableOpponent;
-    }
-
-    this.playersQueue.push({ ...playerData, clientId: playerData.clientId });
-    return null;
-  }
-
-  disconnect(clientId: string) {
-    this.playersQueue = this.playersQueue.filter(
-      (player) => player.clientId !== clientId,
-    );
-  }
-
-  async getPlayerData(nickname: string): Promise<Player | null> {
-    const user = await this.userService.getOne(nickname);
-    if (user) {
+  getWaitingQueue(): ReturnQueueEntityDto[] {
+    return this.waitingQueue.map(e => {
       return {
-        nickname: user.nickname,
-        elo: user.score || 1000,
-        clientId: null,
-      };
-    }
-    return null;
+          userNickname: e.userNickname,
+          userScore: e.userScore
+      }
+  });
   }
 
-  cancelQueue(clientId: string) {
-    this.playersQueue = this.playersQueue.filter(
-      (player) => player.clientId !== clientId,
-    );
+  leaveQueue(cliendId: string): boolean {
+    const initLength: number = this.waitingQueue.length;
+    this.waitingQueue = this.waitingQueue.filter(e => e.clientId !== cliendId);
+    return initLength < this.waitingQueue.length ? true : false;
   }
 }

@@ -12,7 +12,7 @@ export class AuthService {
     pass: string,
     session: SessionData,
   ): Promise<void> {
-    const user = await this.usersService.getOne(nickname);
+    const user = await this.usersService.getAuthData(nickname);
     console.log('user', user);
     if (user?.password !== pass) {
       throw new UnauthorizedException();

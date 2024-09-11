@@ -4,7 +4,9 @@ import { GameEntity } from 'src/database/tables/GameEntity';
 import { User } from 'src/database/tables/User';
 import { IsNull, Not, Repository } from 'typeorm';
 import { CreateGameDto } from './dto/createGameDto';
-import { UpdateGameDto } from './dto/updateGameDto';
+import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
+import { ReturnGameDto } from './dto/returnGameDto';
+import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 
 @Injectable()
 export class GameService {
@@ -16,54 +18,69 @@ export class GameService {
         private readonly userRepository: Repository<User>
     ) {}
 
-    async getAllUserGames(nickname: string): Promise<GameEntity[]> {
+    async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
         const user: User =  await this.userRepository.findOne({ where: { nickname: nickname} });
         if (!user)
             throw new NotFoundException(`There is no user with nickname ${nickname}.`);
         
-        return this.gameRepository.find({
+        return (await this.gameRepository.find({
             where: [
                 {player1: user},
                 {player2: user}
             ],
             relations: ['player1', 'player2']
+        })).map(e => {
+            return this.returnGame(e);
         });
     }
 
-    async getAllActiveGames(): Promise<GameEntity[]> {
-        return this.gameRepository.find({ where: { 
+    async getAllActiveGames(): Promise<ReturnGameDto[]> {
+        return (await this.gameRepository.find({ where: { 
             player1: Not(IsNull()),
             player2: Not(IsNull()),
             winner: IsNull()
-        }});
+        }})).map(e => {
+            return this.returnGame(e);
+        });
     }
 
-    async getAllFinishedGames(): Promise<GameEntity[]> {
-        return this.gameRepository.find({ where: {
-            player1: Not(IsNull()),
-            player2: Not(IsNull()),
-            winner: Not(IsNull())
-        }})
+    async createGame(data: CreateGameDto): Promise<ReturnGameDto> {
+        const player1 = await this.userRepository.findOne({ where: { nickname: data.player1 }});
+        const player2 = await this.userRepository.findOne({ where: { nickname: data.player2 }});
+        const e: GameEntity = new GameEntity()
+        e.player1 = player1;
+        e.player2 = player2;
+        const newGame = await this.gameRepository.save(e);
+        return this.returnGame(newGame);
     }
 
-    async createGame(game: CreateGameDto): Promise<GameEntity> {
-        const gameEntity: GameEntity = new GameEntity();
-
-        gameEntity.player1 = game.player1;
-        gameEntity.player2 = game.player2;
-        gameEntity.winner = null;
-
-        return this.gameRepository.save(gameEntity);
-    }
-
-    async setWinner(data: UpdateGameDto): Promise<GameEntity> {
-        const game: GameEntity = await this.gameRepository.findOne({ where: { id: data.id } });
-
-        if (!game.winner || game.winner.trim() !== '')
+    async setWinner(data: UpdateGameWinnerDto): Promise<ReturnGameDto> {
+        const game = await this.gameRepository.findOne({ where: { id: data.id }});
+        if(game.winner.trim().length <= 0)
             throw new ConflictException(`Winner already exist.`);
 
         game.winner = data.winner;
+        const updatedGame = await this.gameRepository.save(game);
+        return this.returnGame(updatedGame);
+    }
 
-        return this.gameRepository.save(game);
+    private returnGame(game: GameEntity): ReturnGameDto {
+        const player1 = new ReturnUserDto();
+        player1.id = game.player1.id;
+        player1.nickname = game.player1.nickname;
+        player1.score = game.player1.score;
+        player1.img = game.player1.img;
+
+        const player2 = new ReturnUserDto();
+        player2.id = game.player2.id;
+        player2.nickname = game.player2.nickname;
+        player2.score = game.player2.score;
+        player2.img = game.player2.img;
+        return {
+            id: game.id,
+            player1: player1,
+            player2: player2,
+            winner: game.winner
+        }
     }
 }

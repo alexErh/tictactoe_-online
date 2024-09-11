@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
 
 
-export class UpdateGameDto {
+export class UpdateGameWinnerDto {
     @IsNotEmpty()
     @ApiProperty()
     id: string;
