@@ -4,29 +4,38 @@ import { AppModule } from './app.module';
 import 'reflect-metadata';
 import * as session from 'express-session';
 import * as crypto from 'crypto';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
-declare module "express-session" {
-    interface SessionData {
-        isLoggedIn?: boolean;
-        user?: { nickname: string };
-    }
+declare module 'express-session' {
+  interface SessionData {
+    isLoggedIn?: boolean;
+    user?: {
+      nickname: string;
+      isAdmin: boolean;
+    };
+  }
 }
+
 async function bootstrap() {
+
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+
   app.use(
-      session({
-        secret: crypto.randomBytes(32).toString('hex'),
-        resave: false,
-        saveUninitialized: false,
-      }),
+    session({
+      secret: crypto.randomBytes(32).toString('hex'),
+      resave: false,
+      saveUninitialized: false,
+    }),
   );
+
   const config = new DocumentBuilder()
-      .setTitle('TicTacToe Online')
-      .setDescription('The API for the online TicTacToe game')
-      .setVersion('1.0')
-      .addTag('TicTacToe')
-      .build();
+    .setTitle('TicTacToe Online')
+    .setDescription('The API for the online TicTacToe game')
+    .setVersion('1.0')
+    .addTag('TicTacToe')
+    .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

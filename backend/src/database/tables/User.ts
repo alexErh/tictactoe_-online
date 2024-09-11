@@ -1,22 +1,30 @@
-import { Column, Entity, PrimaryColumn, Unique } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Buffer } from 'buffer';
 
 @Entity()
-@Unique(["nickname"])
+@Unique(['nickname'])
 export class User {
-    @PrimaryColumn()
-    nickname: string;
+  @ApiProperty({ example: 'maxmusterman123' })
+  @PrimaryColumn()
+  nickname: string;
 
-    @Column()
-    password: string;
+  @ApiProperty({ example: 'verySecurepassword32!' })
+  @Column()
+  password: string;
 
-    @Column({ default: 1000 })
-    score?: number;
+  @ApiProperty({ example: 1000 })
+  @Column({ default: 1000 })
+  score: number;
 
-    @Column({ default: false })
-    isAdmin?: boolean;
+  @ApiProperty({ example: false })
+  @Column({ default: false })
+  isAdmin: boolean;
 
-    @Column({
-        type: 'blob'
-    })
-    img?: Buffer;
+  @ApiProperty({ example: [] })
+  @Column({
+    type: 'blob',
+    nullable: true,
+  })
+  img: Buffer;
 }

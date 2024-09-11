@@ -1,39 +1,47 @@
-.card {
-  width: 75%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.btn-primary {
-  background-color: #007bff; /* Bootstrap blue */
-  border-color: #007bff;
-}
-
-.btn-success {
-  background-color: #28a745; /* Bootstrap green */
-  border-color: #28a745;
-  margin-top: 20px;
-}
-
 .container-fluid {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
 }
+.container {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.card {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.d-flex {
+  display: flex;
+  justify-content: center;
+}
 
 .text-center {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px; /* Abstand nach oben */
+  margin-top: 20px;
 }
 
 .mt-3 {
-  margin-top: 1rem; /* Abstand nach oben */
+  margin-top: 1rem;
+}
+
+.btn-danger {
+  margin-top: 20px;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  margin-top: 20px;
 }
 
 a.text-primary {
@@ -44,4 +52,15 @@ a.text-primary {
 a.text-primary:hover {
   color: #0056b3;
   text-decoration: underline;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.card-header {
+  padding: 0.75rem 1.25rem;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
 }

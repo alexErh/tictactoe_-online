@@ -9,30 +9,21 @@ import { CreateUserDto } from './dto/createUserDto';
 import { UpdateUserDto } from './dto/updateUserDto';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { readFileSync } from 'fs';
+
 @Injectable()
 export class UsersService {
+  avatar_placeholder_path: string = 'src/assets/portrait.jpg';
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  // dummy data for testing
-  // todo replace it with database methods
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
 
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
   }
+
 
   async getOne(nickname: string): Promise<User> {
     const user: User = await this.userRepository.findOne({
@@ -64,6 +55,10 @@ export class UsersService {
     return createdUser;
   }
 
+
+
+
+
   async update(
     updateUserDto: UpdateUserDto,
     file?: Express.Multer.File,
@@ -72,11 +67,18 @@ export class UsersService {
       where: { nickname: updateUserDto.nickname },
     });
 
-    if (file) userToUpdate.img = file.buffer;
+    if (!userToUpdate) {
+      throw new NotFoundException(
+        `User with nickname ${updateUserDto.nickname} not found`,
+      );
+    }
+
+    if (file) {
+      userToUpdate.img = file.buffer;
+    }
     userToUpdate.password = updateUserDto.password;
     userToUpdate.score = updateUserDto.score;
     userToUpdate.isAdmin = updateUserDto.isAdmin;
-
     return await this.userRepository.save(userToUpdate);
   }
 }
