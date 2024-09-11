@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Controller, Get, Param, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GameEntity } from 'src/database/tables/GameEntity';
@@ -49,4 +50,14 @@ export class GameController {
             throw new UnauthorizedException('You are not admin');
         
     }
+=======
+import { Body, Controller, Param, Post } from '@nestjs/common';
+import { GameService } from './game.service';
+
+
+@Controller('game')
+export class GameController {
+  constructor(private readonly gameService: GameService) {}
+
+>>>>>>> main
 }

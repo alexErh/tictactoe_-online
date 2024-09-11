@@ -1,88 +1,91 @@
-.profile-container {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
+.container-fluid {
+  height: 100vh;
 }
 
-.profile-header h1 {
-  color: #343a40;
+.vh-100 {
+  height: 100vh;
 }
 
-.profile-details {
-  border-bottom: 1px solid #dee2e6;
-  padding-bottom: 20px;
+.m-4 {
+  margin: 1.5rem;
 }
 
-.profile-picture img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
+.mt-0 {
+  margin-top: 0;
 }
 
-.profile-info p {
-  font-size: 16px;
-}
-
-.player-stats h3, .game-history h3, .profile-settings h3 {
-  color: #007bff;
-}
-
-.game-history .list-group-item {
-  background-color: #ffffff;
-}
-
-.profile-settings .btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-}
-.nav {
-  background-color: #f8f9fa;
-  padding-left: 10px;
-  height: 100%;
-
-}
-
-.nav-item {
-  transition: background-color 0.3s ease;
-}
-
-.nav-item:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.small-nav-item {
-  padding: 10px 15px;
-  max-width: 130px;
-  margin: 5px auto;
-}
-
-.logout-item {
-  background-color: #dc3545;
-  color: white;
-}
-
-.logout-item:hover {
-  background-color: #c82333;
-}
-
-.nav-item i {
-  font-size: 1.2em;
-}
-
-.text-primary {
-  color: #007bff;
+.mt-5 {
+  margin-top: 3rem;
 }
 
 .mb-4 {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
 
-.border {
-  border: 1px solid #dee2e6;
+.d-flex {
+  display: flex;
 }
-.nav-link.active {
-  background-color: #007bff;
+
+.flex-column {
+  flex-direction: column;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-start {
+  justify-content: flex-start;
+}
+
+.accordion {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.accordion-item {
+  border: none;
+}
+
+.accordion-header {
+  background-color: black;
   color: white;
+}
 
+.accordion-button {
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+}
+
+.accordion-button.collapsed {
+  color: black;
+}
+
+.accordion-collapse {
+  background-color: #fff;
+}
+
+/* Buttons */
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-success:disabled {
+  background-color: #c3e6cb;
+  border-color: #c3e6cb;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.list-group-item {
+  padding: 1rem;
 }

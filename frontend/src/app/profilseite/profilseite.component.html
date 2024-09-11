@@ -1,54 +1,29 @@
 <div class="container-fluid">
   <div class="row justify-content-center m-4">
     <!-- Menü (1/3 der Seite) -->
-    <div class="col-md-3 bg-light vh-100 d-flex flex-column">
-      <nav class="nav flex-column w-100 border rounded p-3 h-100">
-        <div class="text-center mb-4 mt-4">
-          <h2 class="text-primary">Navigation</h2>
-        </div>
-        <a routerLink="/start" routerLinkActive="active" class="nav-link rounded">
-          <div class="nav-item small-nav-item text-center rounded">
-            <span class="ms-2">Startseite</span>
-          </div>
-        </a>
-        <a routerLink="/profil" routerLinkActive="active" class="nav-link rounded">
-          <div class="nav-item small-nav-item text-center rounded">
-            <span class="ms-2"> Mein Profil</span>
-          </div>
-        </a>
-        <a routerLink="/admin" routerLinkActive="active" class="nav-link rounded">
-          <div class="nav-item small-nav-item text-center rounded">
-            <span class="ms-2"> Adminbereich</span>
-          </div>
-        </a>
-        <a class="nav-link" href="/login">
-          <div class="nav-item small-nav-item text-center rounded logout-item">
-            <span class="ms-2">Abmelden</span>
-          </div>
-        </a>
-      </nav>
-    </div>
+    <app-navigation class="col-md-3 bg-light vh-100 d-flex flex-column"></app-navigation>
+
+    <!-- Inhalt (2/3 der Seite) -->
     <div class="col-md-9">
-      <div class="container profile-container mt-0">
+      <div class="profile-container mt-0">
         <!-- Bild und Name -->
         <div class="row profile-details mb-4 align-items-center justify-content-start mt-5">
           <div class="col-md-4 d-flex justify-content-center">
             <div class="profile-picture">
-              <img [src]="profileImage || defaultProfileImage" alt="Profilbild" class="img-fluid rounded-circle" />
+              <img ngSrc="{{ profileImage || defaultProfileImage }}" alt="Profilbild" class="img-fluid rounded-circle" width="200" height="200"/>
             </div>
+
           </div>
           <div class="col-md-8">
             <div class="profile-info text-start">
-              <p>Vorname: {{ playerStats?.firstName }}</p>
-              <p>Nachname: {{ playerStats?.lastName }}</p>
-              <p>Aktuelle Elo-Zahl: {{ playerStats?.elo }}</p>
+              <p>Name: {{ playerStats?.nickname }}</p>
+              <p>Scores: {{ playerStats?.score }}</p>
             </div>
           </div>
         </div>
 
         <!-- Accordion für die Abschnitte -->
-        <div class="accordion" id="accordionFlushExample" style="max-width: 700px;" >
-
+        <div class="accordion" id="accordionFlushExample">
           <!-- Spielerstatistik -->
           <div class="accordion-item">
             <h2 class="accordion-header" id="flush-headingStats">
@@ -59,7 +34,7 @@
             <div id="flush-collapseStats" class="accordion-collapse collapse" [ngClass]="{'show': isStatsLoaded}" aria-labelledby="flush-headingStats" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
                 <p>Gewonnene Spiele: {{ playerStats?.wins }}-mal</p>
-                <p>Verlorene Spiele: {{ playerStats?.losses }}-mal </p>
+                <p>Verlorene Spiele: {{ playerStats?.losses }}-mal</p>
               </div>
             </div>
           </div>
@@ -67,18 +42,18 @@
           <!-- Spielhistorie -->
           <div class="accordion-item">
             <h2 class="accordion-header" id="flush-headingHistory">
-              <button class="accordion-button collapsed" type="button" (click)="showHistory()" data-bs-toggle="collapse" data-bs-target="#flush-collapseSettings" aria-expanded="false" aria-controls="flush-collapseSettings">
+              <button class="accordion-button collapsed" type="button" (click)="showHistory()" data-bs-toggle="collapse" data-bs-target="#flush-collapseHistory" aria-expanded="false" aria-controls="flush-collapseHistory">
                 Spielhistorie anzeigen
               </button>
             </h2>
             <div id="flush-collapseHistory" class="accordion-collapse collapse" [ngClass]="{'show': isHistoryLoaded}" aria-labelledby="flush-headingHistory" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
                 <ul class="list-group">
-                  @for (game of gameHistory; track trackGameById) {
+                  @for (game of gameHistory; track game) {
                     <li class="list-group-item">
-                      <p>Gegner: {{ game.opponent }}</p>
-                      <p>Spielergebnis: {{ game.result }}</p>
-                      <p>Datum: ({{ game.date }})</p>
+                      <p>Spieler 1: {{ game.player1 }}</p>
+                      <p>Spieler 2: {{ game.player2 }}</p>
+                      <p>Gewinner: {{ game.winner || 'Keiner' }}</p>
                     </li>
                   }
                 </ul>
@@ -101,14 +76,13 @@
                     <label for="password" class="form-label">Neues Passwort:</label>
                     <input id="password" formControlName="password" type="password" class="form-control" />
                   </div>
-                  <button type="submit" class="btn btn-success" [disabled]="profileForm.invalid">Passwort ändern</button>
+                  <button type="submit" class="btn btn-danger" [disabled]="profileForm.invalid">Passwort ändern</button>
                 </form>
 
-                <h3 class="text-primary mt-4">Profilbild aktualisieren</h3>
+
+                <h3 class="mt-4">Profilbild aktualisieren</h3>
                 <input type="file" (change)="onFileChange($event)" class="form-control" />
-                @if (uploadProgress > 0) {
-                  <p class="mt-2">Upload-Fortschritt: {{ uploadProgress }}%</p>
-                }
+
               </div>
             </div>
           </div>

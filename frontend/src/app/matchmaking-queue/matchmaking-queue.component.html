@@ -4,13 +4,13 @@
     <p>Warte auf einen Gegner...</p>
   </div>
 
-  @if (matchFound) {
+  @if (matchFound){
     <div class="match-found">
       <p>Gegner gefunden! Du spielst gegen: {{ matchFound.nickname }}({{ matchFound.elo }})</p>
     </div>
   }
 
-  @if (!matchFound) {
+  @if (!matchFound){
     <div class="waiting-animation">
       <div class="spinner"></div>
       <p>Warten auf einen Gegner...</p>

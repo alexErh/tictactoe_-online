@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+<<<<<<< HEAD
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+=======
+import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Buffer } from 'buffer';
+>>>>>>> main
 
 @Entity()
 export class User {
@@ -20,6 +25,7 @@ export class User {
 
   @Column({
     type: 'blob',
+    nullable: true,
   })
   img: Buffer;
 }

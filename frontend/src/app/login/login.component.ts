@@ -1,40 +1,38 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     FormsModule,
-    NgClass,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  username: string = '';
+  nickname: string = '';
   password: string = '';
+
+  constructor(private router: Router) {}
 
   onLogin(form: any) {
     if (form.valid) {
-      // Dummy Login Logic: Replace this with actual login logic
-    const validUser = 'testuser';
-    const validPassword = 'testuser';
+      const validUser = 'Dunia';
+      const validPassword = 'Dunia';
 
-    if (this.username === validUser && this.password === validPassword) {
-      // Successful login
-      alert('Erfolgreich angemeldet!');
-      this.clearForm();
-    } else {
-      // Failed login
-      alert('Benutzername oder Passwort falsch. Bitte versuchen Sie es erneut.');
+      if (this.nickname === validUser && this.password === validPassword) {
+        this.clearForm();
+        this.router.navigate(['/start']);
+      } else {
+        alert('Benutzername oder Passwort falsch. Bitte versuchen Sie es erneut.');
+      }
     }
   }
-}
 
-clearForm() {
-  this.username = '';
-  this.password = '';
-}
+  clearForm() {
+    this.nickname = '';
+    this.password = '';
+  }
 }

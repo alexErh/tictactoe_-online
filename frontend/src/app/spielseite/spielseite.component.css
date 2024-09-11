@@ -1,0 +1,35 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 100px 100px 100px;
+  grid-gap: 5px;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+app-square {
+  border: 1px  solid #70747c;
+  height: 100px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+

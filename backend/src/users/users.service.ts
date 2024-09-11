@@ -14,7 +14,7 @@ import { AuthDataDto } from './dto/authDataDto';
 
 @Injectable()
 export class UsersService {
-  avatar_placeholder_path: string = 'src/assets/avatar_placeholder.jpeg';
+  avatar_placeholder_path: string = 'src/assets/portrait.jpg';
 
   constructor(
     @InjectRepository(User)
@@ -26,7 +26,8 @@ export class UsersService {
     return {
       id: user.id,
       nickname: user.nickname,
-      password: user.password
+      password: user.password,
+      isAdmin: user.isAdmin
     }
   }
 
@@ -35,6 +36,7 @@ export class UsersService {
       return this.returnUser(e)
     });
   }
+
 
   async getOne(nickname: string): Promise<ReturnUserDto> {
     const user: User = await this.userRepository.findOne({
@@ -57,11 +59,8 @@ export class UsersService {
       where: { nickname: newUser.nickname },
     });
 
-    if (existingUser) {
-      throw new ConflictException(
-        `User with nickname ${existingUser.nickname} already exists`,
-      );
-    }
+    if (existingUser)
+      throw new ConflictException(`User with nickname ${existingUser.nickname} already exists`);
 
     const createdUser: User = await this.userRepository.save(newUser);
     return this.returnUser(createdUser)
@@ -73,14 +72,11 @@ export class UsersService {
     });
 
     if (!userToUpdate) {
-      throw new NotFoundException(
-        `User with nickname ${updateUserDto.nickname} not found`,
-      );
+      throw new NotFoundException(`User with nickname ${updateUserDto.nickname} not found`);
     }
 
-    if (file) {
+    if (file)
       userToUpdate.img = file.buffer;
-    }
     userToUpdate.password = updateUserDto.password;
     userToUpdate.score = updateUserDto.score;
     userToUpdate.isAdmin = updateUserDto.isAdmin;
