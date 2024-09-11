@@ -1,23 +1,26 @@
 <div class="container-fluid">
-  <div class="card">
-    <div class="card-header bg-primary text-white">Anmelden</div>
-    <div class="card-body">
-      <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" class="form-control" required [(ngModel)]="username" name="username">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white text-center">
+        <h5>Tic-Tac-Toe - Anmeldung</h5>
+      </div>
+      <div class="card-body p-4">
+        <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
+          <div class="form-group mb-3">
+            <label for="username" class="form-label">Name</label>
+            <input type="text" id="username" class="form-control" required [(ngModel)]="nickname" name="username">
+          </div>
+          <div class="form-group mb-4">
+            <label for="password" class="form-label">Passwort</label>
+            <input type="password" id="password" class="form-control" required [(ngModel)]="password" name="password">
+          </div>
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-danger" [disabled]="!loginForm.valid">Anmelden</button>
+          </div>
+        </form>
+        <div class="text-center mt-4">
+          <span>Noch kein Konto? <a href="/register" class="text-primary">Register</a></span>
         </div>
-        <div class="form-group">
-          <label for="password">Passwort</label>
-          <input type="password" id="password" class="form-control" required [(ngModel)]="password" name="password">
-        </div>
-        <div class="d-flex justify-content-center">
-          <button type="submit" class="btn btn-success" [disabled]="!loginForm.valid">Anmelden</button>
-        </div>
-      </form>
-
-      <div class="text-center mt-3">
-        <span>Noch kein Konto? <a href="/register" class="text-primary">Registrieren</a></span>
       </div>
     </div>
   </div>

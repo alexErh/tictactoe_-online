@@ -1,24 +1,29 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
-import {UsersService} from "../users/users.service";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 import { SessionData } from 'express-session';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) {}
 
-    async signIn(username: string, pass: string, session: SessionData): Promise<void> {
-        const user = await this.usersService.findOne(username);
-        console.log("user", user);
-        if (user?.password !== pass) {
-            throw new UnauthorizedException();
-        }
-        session.isLoggedIn = true;
-        session.user = { id: user.userId, username: user.username };
+  async signIn(
+    nickname: string,
+    pass: string,
+    session: SessionData,
+  ): Promise<void> {
+    const user = await this.usersService.getOne(nickname);
+
+    if (!user || user.password !== pass) {
+      throw new UnauthorizedException('Ungültige Anmeldeinformationen');
     }
 
-    signOut(session: SessionData): void {
-        session.isLoggedIn = undefined;
-        delete session.user;
-    }
+    session.isLoggedIn = true;
+    //in anderen Stellen (session.user.isAdmin) prüfen, ob der Nutzer die entsprechenden Rechte für einen Admin-Bereich hat.
+    session.user = { nickname: user.nickname, isAdmin: user.isAdmin || false };
+  }
 
+  signOut(session: SessionData): void {
+    session.isLoggedIn = undefined;
+    delete session.user;
+  }
 }

@@ -1,0 +1,51 @@
+.nav {
+  background-color: #f8f9fa;
+  padding-left: 10px;
+  height: 100%;
+
+}
+
+.nav-item {
+  transition: background-color 0.3s ease;
+}
+
+.nav-item:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.small-nav-item {
+  padding: 10px 15px;
+  max-width: 130px;
+  margin: 5px auto;
+}
+
+.logout-item {
+  background-color: #dc3545;
+  color: white;
+}
+
+.logout-item:hover {
+  background-color: #c82333;
+}
+
+.nav-item i {
+  font-size: 1.2em;
+}
+
+.text-primary {
+  color: #007bff;
+}
+
+.mb-4 {
+  margin-bottom: 20px;
+}
+
+.border {
+  border: 1px solid #dee2e6;
+}
+.nav-link.active {
+  background-color: #007bff;
+  color: white;
+
+}

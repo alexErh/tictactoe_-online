@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { WebsocketService } from '../services/websocket.service';
-
+import { Player } from '../models/player.model';
 
 @Component({
   selector: 'app-matchmaking-queue',
@@ -11,23 +10,77 @@ import { WebsocketService } from '../services/websocket.service';
   imports: [CommonModule],
   providers: [MatchmakingQueueService],
   templateUrl: './matchmaking-queue.component.html',
-  styleUrls: ['./matchmaking-queue.component.css']
+  styleUrls: ['./matchmaking-queue.component.css'],
 })
+export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
+  matchFound: Player | null = null;
+  waiting: boolean = false;
 
-export class MatchmakingQueueComponent implements OnInit {
-  matchFound: any;
-
-  constructor(private webSocketService: MatchmakingQueueService,private socketService: WebsocketService, private router: Router) {}
+  constructor(
+    private matchmakingQueueService: MatchmakingQueueService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.webSocketService.joinQueue({ username: 'Player1', elo: 1200 });
+    this.joinQueue();
 
-    this.webSocketService.onMatchFound().subscribe(opponent => {
-      this.matchFound = opponent;
+    this.matchmakingQueueService.onMatchFound().subscribe((opponent) => {
+      if (opponent) {
+        this.matchFound = opponent;
+        this.waiting = false;
+
+        setTimeout(() => {
+          this.startGame();
+        }, 3000);
+      }
+    });
+
+  }
+
+  ngOnDestroy() {
+    this.disconnect();
+  }
+
+  joinQueue() {
+    const playerData = { nickname: 'Player1', elo: 1200 };
+    this.waiting = true;
+    this.matchmakingQueueService.joinQueue(playerData);
+  }
+
+  confirmCancelQueue() {
+    const confirmed = window.confirm('Möchtest du wirklich die Warteschlange abbrechen?');
+    if (confirmed) {
+      this.cancelQueue();
+    }
+  }
+
+  cancelQueue() {
+    this.matchmakingQueueService.cancelQueue();
+    this.router.navigate(['/start']).then(() => {
+      this.waiting = false;
+    }).catch((error) => {
+      console.error('Navigation failed:', error);
     });
   }
 
-  startGame() {
-    this.router.navigate(['/game'], { state: { opponent: this.matchFound } });
+
+  disconnect() {
+    this.matchmakingQueueService.disconnect();
   }
+
+  startGame() {
+    if (this.matchFound) {
+      this.router.navigate(['/game'], { state: { opponent: this.matchFound } })
+        .then(() => {
+        })
+        .catch((error) => {
+          console.error('Navigation zur Spielseite fehlgeschlagen:', error);
+
+        });
+    } else {
+      console.error('Kein Gegner gefunden, kann das Spiel nicht starten.');
+    }
+  }
+
+
 }
