@@ -22,13 +22,20 @@ export class AdminService {
       .createQueryBuilder('game')
       .where('game.player1 IS NOT NULL')
       .andWhere('game.player2 IS NOT NULL')
+      .andWhere('game.board IS NULL')
+      .andWhere('game.currentTurn IS NULL')
+      .andWhere('game.winner IS NULL')
       .getMany();
   }
 
   async getQueue(): Promise<Game[]> {
     return this.gameRepository
       .createQueryBuilder('game')
+      .where('game.player1 IS NOT NULL')
       .where('game.player2 IS NULL')
+      .andWhere('game.board IS NULL')
+      .andWhere('game.currentTurn IS NULL')
+      .andWhere('game.winner IS NULL')
       .getMany();
   }
 }
