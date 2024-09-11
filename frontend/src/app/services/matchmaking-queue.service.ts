@@ -29,20 +29,6 @@ export class MatchmakingQueueService {
       transports: ['websocket']
     });  }
 
-  emit(event: string, data: any) {
-    this.socket.emit(event, data);
-  }
-
-  //listen: Gibt ein Observable zurück, das ein Ereignis vom Server abonniert. Wenn das Ereignis eintritt, wird der Observer mit den empfangenen Daten benachrichtigt.
-  // Die Rückgabefunktion sorgt dafür, dass der Listener entfernt wird, wenn das Observable unsubscribed wird.
-  listen(event: string): Observable<any> {
-    return new Observable((observer) => {
-      this.socket.on(event, (data) => {
-        observer.next(data);
-      });
-      return () => this.socket.off(event);
-    });
-  }
 
   disconnect() {
     if (this.socket) {
@@ -68,7 +54,14 @@ export class MatchmakingQueueService {
     );
   }
 
-  getMatchFound(): Observable<Player | null> {
-    return this.matchFound$.asObservable();
+  //listen: Gibt ein Observable zurück, das ein Ereignis vom Server abonniert. Wenn das Ereignis eintritt, wird der Observer mit den empfangenen Daten benachrichtigt.
+  // Die Rückgabefunktion sorgt dafür, dass der Listener entfernt wird, wenn das Observable unsubscribed wird.
+  listen(event: string): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on(event, (data) => {
+        observer.next(data);
+      });
+      return () => this.socket.off(event);
+    });
   }
 }

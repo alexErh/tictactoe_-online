@@ -14,17 +14,6 @@ export class MatchService {
 
   constructor(private userService: UsersService) {}
 
-  async identify(user: string, clientId: string) {
-    const existingUser = await this.userService.getOne(user);
-    if (existingUser) {
-      console.log(
-        `User identified: ${existingUser.nickname} with client ID: ${clientId}`,
-      );
-    } else {
-      console.log(`User not found: ${user}`);
-    }
-  }
-
   async findMatch(playerData: Player): Promise<Player | null> {
     const suitableOpponent = this.playersQueue.find(
       (player) => Math.abs(player.elo - playerData.elo) < 200,

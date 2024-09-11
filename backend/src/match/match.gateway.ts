@@ -24,11 +24,6 @@ export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.matchService.disconnect(client.id);
   }
 
-  @SubscribeMessage('identify')
-  async handleIdentify(client: Socket, user: string) {
-    await this.matchService.identify(user, client.id);
-  }
-
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(client: Socket, nickname: string) {
     const playerData = await this.matchService.getPlayerData(nickname);

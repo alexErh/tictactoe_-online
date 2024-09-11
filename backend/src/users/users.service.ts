@@ -9,8 +9,6 @@ import { CreateUserDto } from './dto/createUserDto';
 import { UpdateUserDto } from './dto/updateUserDto';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { readFileSync } from 'fs';
-
 @Injectable()
 export class UsersService {
   avatar_placeholder_path: string = 'src/assets/portrait.jpg';
@@ -23,7 +21,6 @@ export class UsersService {
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
   }
-
 
   async getOne(nickname: string): Promise<User> {
     const user: User = await this.userRepository.findOne({
@@ -54,10 +51,6 @@ export class UsersService {
 
     return createdUser;
   }
-
-
-
-
 
   async update(
     updateUserDto: UpdateUserDto,
