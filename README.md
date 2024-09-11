@@ -70,13 +70,12 @@
 
 ## Backend-Komponenten
 
-### Benutzerverwaltung (User Management)
+### Benutzerverwaltung
 **Funktionen:**
 - Registrierung neuer Benutzer
 - Authentifizierung und Autorisierung (Login/Logout)
-- Verwaltung von Benutzerdaten (Nickname, Passwort, Profilbild)
 - Überprüfung der Eindeutigkeit von Nicknames
-- Passwortänderung
+
 
 **Dateipfad:** `./src/users/`
 
@@ -88,7 +87,7 @@
 
 **Dateipfad:** `./src/match/`
 
-### Spielverwaltung (Game Management)
+### Spielverwaltung
 **Funktionen:**
 - Erstellen und Verwalten von Spielen
 - Bestimmen des startenden Spielers (zufällig)
@@ -98,11 +97,13 @@
 
 **Dateipfad:** `./src/game/`
 
-### Statistik- und Historienverwaltung (Statistics and History Management)
+### Statistik- und Historienverwaltung
 **Funktionen:**
 - Speichern und Abrufen der Spielergebnisse
 - Verwaltung der Spielhistorie (gegen wen gespielt, Ergebnis)
 - Bereitstellung der gewonnenen und verlorenen Spiele
+- Verwaltung von Benutzerdaten (Nickname, Passwort, Profilbild)
+- Passwortänderung
 
 **Dateipfad:** `./src/profile/`
 
@@ -114,7 +115,7 @@
 
 **Dateipfad:** `./src/admin/`
 
-### Elo-Berechnungsservice (Elo Calculation Service)
+### Elo-Berechnungsservice
 **Funktionen:**
 - Berechnung der neuen Elo-Zahlen basierend auf den Spielergebnissen
 - Initialisierung der Elo-Zahl auf 1000 für neue Spieler
