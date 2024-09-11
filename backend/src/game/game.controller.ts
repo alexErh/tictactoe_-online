@@ -20,7 +20,7 @@ export class GameController {
 
     @Get(':nickname')
     @UseGuards(AuthGuard)
-    @ApiResponse({ type: [GameEntity] })
+    @ApiResponse({ type: [ReturnGameDto] })
     async getAllUserGames(@Param("nickname") nickname: string): Promise<ReturnGameDto[]> {
         const games = await this.gameService.getAllUserGames(nickname);
         console.log("games", games)
@@ -29,7 +29,7 @@ export class GameController {
 
     @Get('/active/:nickname')
     @UseGuards(AuthGuard)
-    @ApiResponse({ type: [GameEntity] })
+    @ApiResponse({ type: [ReturnGameDto] })
     async getAllActiveGames(@Param("nickname") nickname: string): Promise<ReturnGameDto[]> {
         const isAdmin = await this.usersService.isAdmin(nickname);
         if (isAdmin)
@@ -41,7 +41,7 @@ export class GameController {
 
     @Get('/waiting/:nickname')
     @UseGuards(AuthGuard)
-    @ApiResponse({ type: [GameEntity] })
+    @ApiResponse({ type: [ReturnGameDto] })
     async getWaitingQueue(@Param("nickname") nickname: string): Promise<ReturnQueueEntityDto[]> {
         if (await this.usersService.isAdmin(nickname))
             return this.matchService.getWaitingQueue();

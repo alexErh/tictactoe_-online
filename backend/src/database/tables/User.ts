@@ -1,10 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-<<<<<<< HEAD
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
-=======
-import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Buffer } from 'buffer';
->>>>>>> main
 
 @Entity()
 export class User {
