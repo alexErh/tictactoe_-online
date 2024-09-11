@@ -32,28 +32,18 @@ export class UsersService {
 
   async getAll(): Promise<ReturnUserDto[]> {
     return (await this.userRepository.find()).map(e => {
-      return {
-        id: e.id,
-        nickname: e.nickname,
-        score: e.score,
-        img: e.img
-      }
+      return this.returnUser(e)
     });
   }
 
   async getOne(nickname: string): Promise<ReturnUserDto> {
-    console.log("nickname: ", nickname)
     const user: User = await this.userRepository.findOne({
       where: {nickname: nickname}
     });
     if (!user)
       throw new NotFoundException();
-    return {
-      id: user.id,
-      nickname: user.nickname,
-      score: user.score,
-      img: user.img
-    };
+    else
+      return this.returnUser(user);
   }
 
     async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<ReturnUserDto> {
@@ -74,12 +64,7 @@ export class UsersService {
     }
 
     const createdUser: User = await this.userRepository.save(newUser);
-    return {
-      id: createdUser.id,
-      nickname: createdUser.nickname,
-      score: createdUser.score,
-      img: createdUser.img
-    };
+    return this.returnUser(createdUser)
   }
 
   async update(updateUserDto: UpdateUserDto, file?: Express.Multer.File): Promise<ReturnUserDto> {
@@ -101,15 +86,20 @@ export class UsersService {
     userToUpdate.isAdmin = updateUserDto.isAdmin;
 
     const updatedUser = await this.userRepository.save(userToUpdate);
-    return {
-      id: updatedUser.id,
-      nickname: updatedUser.nickname,
-      score: updatedUser.score,
-      img: updatedUser.img
-    };
+    return this.returnUser(updatedUser);
   }
 
   async isAdmin(nickname: string): Promise<boolean> {
     return (await this.userRepository.findOne({ where: { nickname: nickname }})).isAdmin;
+  }
+
+  private returnUser(user: User): ReturnUserDto {
+    const base64Image = user.img.toString('base64');
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      score: user.score,
+      img: base64Image
+    };
   }
 }

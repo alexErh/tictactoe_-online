@@ -14,6 +14,7 @@ export class ReturnUserDto {
     @IsNumber()
     score: number;
 
-    @ApiProperty({ example: [] })
-    img: Buffer;
+    @ApiProperty({ example: 'data:image/png;base64,iVBORw0K...' })
+    @IsString()
+    img: string;
 }

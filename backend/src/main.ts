@@ -37,7 +37,6 @@ async function bootstrap() {
     .setTitle('TicTacToe Online')
     .setDescription('The API for the online TicTacToe game')
     .setVersion('1.0')
-    .addTag('TicTacToe')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

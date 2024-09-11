@@ -69,13 +69,13 @@ export class GameService {
         player1.id = game.player1.id;
         player1.nickname = game.player1.nickname;
         player1.score = game.player1.score;
-        player1.img = game.player1.img;
+        player1.img = game.player1.img.toString('base64');
 
         const player2 = new ReturnUserDto();
         player2.id = game.player2.id;
         player2.nickname = game.player2.nickname;
         player2.score = game.player2.score;
-        player2.img = game.player2.img;
+        player2.img = game.player2.img.toString('base64');
         return {
             id: game.id,
             player1: player1,
