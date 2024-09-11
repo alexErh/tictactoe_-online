@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
 
 export class ReturnUserDto {
     @ApiProperty({ example: "d16fe161-169e-4b92-80d8-64808466fb88" })
@@ -17,4 +17,8 @@ export class ReturnUserDto {
     @ApiProperty({ example: 'data:image/png;base64,iVBORw0K...' })
     @IsString()
     img: string;
+
+    @ApiProperty({ example: false })
+    @IsBoolean()
+    isAdmin: boolean;
 }

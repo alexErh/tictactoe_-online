@@ -1,11 +1,10 @@
 import { IsArray, IsString } from 'class-validator';
-<<<<<<< HEAD
 import { PlayerDto } from 'src/users/dto/playerDto'; 
-=======
-import { PlayerDto } from '../../users/dto/playerDto';
->>>>>>> main
 
 export class GameStatusDto {
+  @IsString()
+  id: string;
+
   @IsString()
   player1: PlayerDto;
 
@@ -15,16 +14,9 @@ export class GameStatusDto {
   @IsString()
   nextPlayer: string;
 
-<<<<<<< HEAD
-  /* @IsArray()
-  board: CellValue[]; */
+  @IsString()
+  winner: string;
 
-
-}
-=======
   @IsArray()
   board: CellValue[];
-
-
 }
->>>>>>> main

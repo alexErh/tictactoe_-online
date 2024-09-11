@@ -6,6 +6,7 @@ import { PlayerDto } from 'src/users/dto/playerDto';
 import { GameStatusDto } from 'src/game/dto/gameStatusDto';
 import { QueueEntityDto } from './dto/queueEntityDto';
 import { ReturnQueueEntityDto } from './dto/returnQueueEntityDto';
+import { CreateGameDto } from 'src/game/dto/createGameDto';
 
 @Injectable()
 export class MatchService {
@@ -47,9 +48,15 @@ export class MatchService {
         score: player2.score,
         symbol: gameStatus.nextPlayer === player2.nickname ? 'X' : 'O'
       }
-      
+      const data: CreateGameDto = new CreateGameDto();
+      data.player1 = player_1.nickname;
+      data.player2 = player_2.nickname;
+
       gameStatus.player1 = player_1;
       gameStatus.player2 = player_2;
+
+      gameStatus.id = (await this.gameService.createGame(data)).id;
+
       return gameStatus;
     } else {
       const e: QueueEntityDto = new QueueEntityDto();

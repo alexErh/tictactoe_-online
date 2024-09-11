@@ -6,11 +6,12 @@ import {
 import { Repository } from 'typeorm';
 import { User } from 'src/database/tables/User';
 import { CreateUserDto } from './dto/createUserDto';
-import { UpdateUserDto } from './dto/updateUserDto';
+import { UpdateScoreDto } from './dto/updateScoreDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 import { ReturnUserDto } from './dto/returnUserDto';
 import { AuthDataDto } from './dto/authDataDto';
+import { UpdatePasswordDto } from './dto/updatePasswordDto';
 
 @Injectable()
 export class UsersService {
@@ -66,23 +67,52 @@ export class UsersService {
     return this.returnUser(createdUser)
   }
 
-  async update(updateUserDto: UpdateUserDto, file?: Express.Multer.File): Promise<ReturnUserDto> {
+  async updateScore(updateUserDto: UpdateScoreDto): Promise<ReturnUserDto> {
     const userToUpdate: User = await this.userRepository.findOne({
-      where: { nickname: updateUserDto.nickname },
+      where: { nickname: updateUserDto.nickname }
     });
 
     if (!userToUpdate) {
       throw new NotFoundException(`User with nickname ${updateUserDto.nickname} not found`);
     }
 
-    if (file)
-      userToUpdate.img = file.buffer;
-    userToUpdate.password = updateUserDto.password;
     userToUpdate.score = updateUserDto.score;
-    userToUpdate.isAdmin = updateUserDto.isAdmin;
 
     const updatedUser = await this.userRepository.save(userToUpdate);
     return this.returnUser(updatedUser);
+  }
+
+  async updatePW(data: UpdatePasswordDto): Promise<ReturnUserDto> {
+    const user: User = await this.userRepository.findOne({
+      where: { nickname: data.nickname }
+    });
+
+    if(!user)
+      throw new NotFoundException(`User with nickname ${data.nickname} not found`);
+    else if(user.password !== data.oldPW)
+      throw new ConflictException('The old password is false.');
+    else {
+      user.password = data.newPW;
+      return this.returnUser(user);
+    }
+  }
+
+  async updateImg(nickname: string, img: Express.Multer.File): Promise<ReturnUserDto> {
+    const userToUpdate: User = await this.userRepository.findOne({
+      where: { nickname: nickname }
+    });
+
+    userToUpdate.img = img.buffer;
+
+    return this.returnUser(await this.userRepository.save(userToUpdate));
+  }
+
+  async updateToAdmin(nickname: string): Promise<ReturnUserDto> {
+    const userToUpdate: User = await this.userRepository.findOne({
+      where: { nickname: nickname }
+    });
+    userToUpdate.isAdmin = true;
+    return this.returnUser(await this.userRepository.save(userToUpdate))
   }
 
   async isAdmin(nickname: string): Promise<boolean> {
@@ -95,7 +125,8 @@ export class UsersService {
       id: user.id,
       nickname: user.nickname,
       score: user.score,
-      img: base64Image
+      img: base64Image,
+      isAdmin: user.isAdmin
     };
   }
 }

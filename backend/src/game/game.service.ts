@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from 'src/database/tables/GameEntity';
@@ -8,6 +7,7 @@ import { CreateGameDto } from './dto/createGameDto';
 import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
+import { Board } from './Board';
 
 @Injectable()
 export class GameService {
@@ -84,19 +84,13 @@ export class GameService {
             winner: game.winner
         }
     }
-=======
-import { Injectable } from '@nestjs/common';
-import { Board } from './Board';
-
-@Injectable()
-export class GameService {
-  getWinner(board: Board): string {
-    const winner = board.threeInARow();
-    if (board.isDraw()) {
-      return 'Draw';
-    } else {
-      return winner;
+    
+    getWinner(board: Board): string {
+      const winner = board.threeInARow();
+      if (board.isDraw()) {
+        return 'Draw';
+      } else {
+        return winner;
+      }
     }
-  }
->>>>>>> main
 }
