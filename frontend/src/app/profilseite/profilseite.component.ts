@@ -167,7 +167,6 @@ export class ProfilseiteComponent implements OnInit {
     }
   }
 
-
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {

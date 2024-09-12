@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';  // Importiere AuthService
 
 @Component({
   selector: 'app-login',
@@ -14,25 +15,24 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   nickname: string = '';
   password: string = '';
+  errorMessage: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  onLogin(form: any) {
+  onLogin(form: any): void {
     if (form.valid) {
-      const validUser = 'Dunia';
-      const validPassword = 'Dunia';
+      this.authService.signIn(this.nickname, this.password).subscribe({
+        next: (response) => {
+          const nickname = response.nickname;
+          const isAdmin = response.isAdmin;
 
-      if (this.nickname === validUser && this.password === validPassword) {
-        this.clearForm();
-        this.router.navigate(['/start']);
-      } else {
-        alert('Benutzername oder Passwort falsch. Bitte versuchen Sie es erneut.');
-      }
+          this.authService.setCurrentUser(nickname, isAdmin);
+          this.router.navigate(['/start']);
+        },
+        error: (err) => {
+          this.errorMessage = 'Benutzername oder Passwort falsch. Bitte versuchen Sie es erneut.';
+        }
+      });
     }
-  }
-
-  clearForm() {
-    this.nickname = '';
-    this.password = '';
   }
 }

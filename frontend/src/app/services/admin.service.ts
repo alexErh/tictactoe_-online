@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:3000/admin';
+  private usersApiUrl = 'http://localhost:3000/users';
+  private gamesApiUrl = 'http://localhost:3000/game';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/users`);
+  getUsers(nickname: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.usersApiUrl}/all/${nickname}`);
   }
 
-  getGames(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/games`);
+  getGames(nickname: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.gamesApiUrl}/active/${nickname}`);
   }
 
-  getQueue(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/queue`);
+  getQueue(nickname: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.gamesApiUrl}/queue/${nickname}`);
   }
 }

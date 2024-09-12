@@ -8,7 +8,7 @@ import { MatchService } from './match/match.service';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './database/tables/GameEntity';
 import { ProfileModule } from './profile/profile.module';
-import { AdminModule } from './admin/admin.module';
+import { AdminGuard } from './admin/admin.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -28,9 +28,8 @@ import { AppService } from './app.service';
     GameModule,
     UsersModule,
     ProfileModule,
-    AdminModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MatchGateway, MatchService],
+  providers: [AppService, MatchGateway, MatchService, AdminGuard],
 })
 export class AppModule {}

@@ -1,44 +1,71 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../services/admin.service';
+import { AuthService } from '../services/auth.service'; // AuthService importieren
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrls: ['./admin.component.css'],
 })
-
 export class AdminComponent implements OnInit {
   users: any[] = [];
   games: any[] = [];
   queue: any[] = [];
+  adminNickname: string | null = null;
 
   constructor(
-    private adminService: AdminService
-  ) { }
+    private adminService: AdminService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
-    this.loadGames();
-   this.loadQueue();
+    this.adminNickname = this.authService.getAdminNickname();
+    if (this.adminNickname) {
+      this.loadUsers();
+      this.loadGames();
+      this.loadQueue();
+    } else {
+      console.error('Admin nickname is not available.');
+    }
   }
 
   loadUsers(): void {
-    this.adminService.getUsers().subscribe(data => {
-      this.users = data;
-    });
+    if (this.adminNickname) {
+      this.adminService.getUsers(this.adminNickname).subscribe({
+        next: (data) => {
+          this.users = data;
+        },
+        error: (err) => {
+          console.error('Failed to load users:', err);
+        },
+      });
+    }
   }
 
   loadGames(): void {
-    this.adminService.getGames().subscribe(data => {
-      this.games = data;
-    });
+    if (this.adminNickname) {
+      this.adminService.getGames(this.adminNickname).subscribe({
+        next: (data) => {
+          this.games = data;
+        },
+        error: (err) => {
+          console.error('Failed to load games:', err);
+        },
+      });
+    }
   }
 
   loadQueue(): void {
-    this.adminService.getQueue().subscribe(data => {
-      this.queue = data;
-    });
+    if (this.adminNickname) {
+      this.adminService.getQueue(this.adminNickname).subscribe({
+        next: (data) => {
+          this.queue = data;
+        },
+        error: (err) => {
+          console.error('Failed to load queue:', err);
+        },
+      });
+    }
   }
 }
