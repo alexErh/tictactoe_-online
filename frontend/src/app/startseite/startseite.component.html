@@ -1,1 +1,24 @@
-<p>startseite works!</p>
+<div class="container-fluid">
+  <div class="row justify-content-center m-4">
+    <app-navigation class="col-md-3 bg-light vh-100 d-flex flex-column"></app-navigation>
+
+    <main class="col-md-9">
+      <div class="profile-container mt-0">
+        <div class="text-center mt-5">
+          <h1>Willkommen zu Tic Tac Toe</h1>
+
+          <!-- Anzeige der Elo-Zahl -->
+          <div class="player-info mt-4">
+            <p>Aktuelle Elo-Zahl: {{ playerElo }}</p>
+          </div>
+
+          <button class="btn btn-primary btn-lg mt-4" (click)="playNow()">Jetzt Spielen</button>
+
+          <div class="advertisement mt-4">
+            <p>Spiele jetzt und steigere deine Elo-Zahl, um dein Niveau zu verbessern und der Beste zu werden! 🚀🎮</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
