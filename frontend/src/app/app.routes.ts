@@ -8,6 +8,7 @@ import { ProfilseiteComponent } from './profilseite/profilseite.component';
 import { StartseiteComponent } from './startseite/startseite.component';
 import { AdminComponent } from './admin/admin.component';
 import { AdminGuard } from './admin/admin.guard';
+import { ResultsComponent } from './results/results.component';
 
 export const routes: Routes = [
   { path: 'register', component: RegistrationComponent },
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'matchmaking', component: MatchmakingQueueComponent },
   { path: 'game', component: SpielseiteComponent },
   { path: 'profil', component: ProfilseiteComponent },
+  { path: 'results', component: ResultsComponent },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
