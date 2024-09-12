@@ -38,7 +38,6 @@ export class UsersService {
     });
   }
 
-
   async getOne(nickname: string): Promise<ReturnUserDto> {
     const user: User = await this.userRepository.findOne({
       where: {nickname: nickname}
