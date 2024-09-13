@@ -5,14 +5,12 @@ import 'reflect-metadata';
 import * as session from 'express-session';
 import * as crypto from 'crypto';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ReturnUserDto } from './users/dto/returnUserDto';
 
 declare module 'express-session' {
   interface SessionData {
     isLoggedIn?: boolean;
-    user?: {
-      nickname: string;
-      isAdmin: boolean;
-    };
+    user?: ReturnUserDto;
   }
 }
 
@@ -23,6 +21,7 @@ async function bootstrap() {
 
   app.use(
     session({
+      name: 'TICTACTOE_SASSION_ID',
       secret: crypto.randomBytes(32).toString('hex'),
       resave: false,
       saveUninitialized: false,

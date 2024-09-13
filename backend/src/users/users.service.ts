@@ -24,6 +24,8 @@ export class UsersService {
 
   async getAuthData(nickname: string): Promise<AuthDataDto> {
     const user = await this.userRepository.findOne({ where: { nickname: nickname }});
+    if (!user)
+      throw new NotFoundException();
     return {
       id: user.id,
       nickname: user.nickname,

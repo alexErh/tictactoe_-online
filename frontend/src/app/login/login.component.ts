@@ -26,7 +26,7 @@ export class LoginComponent {
           const nickname = response.nickname;
           const isAdmin = response.isAdmin;
 
-          this.authService.setCurrentUser(nickname, isAdmin);
+          
           this.router.navigate(['/start']);
         },
         error: (err) => {

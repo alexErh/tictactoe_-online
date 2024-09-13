@@ -25,17 +25,19 @@ export class AuthController {
   @Post('login')
   @ApiResponse({ type: SignInDto })
   async signIn(@Session() session: SessionData, @Body() signInDto: SignInDto) {
+    
     await this.authService.signIn(
-      signInDto.username,
+      signInDto.nickname,
       signInDto.password,
       session,
     );
-    return { message: 'Login successful' };
+    console.log('singin',session)
+    return session;
   }
-
 
   @Post('logout')
   logout(@Session() session: SessionData) {
+    console.log('logout', session)
     this.authService.signOut(session);
     return { message: 'Logout successful' };
   }
