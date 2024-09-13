@@ -15,6 +15,8 @@ export class GameEntity {
     @JoinColumn()
     player2: User;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     winner: string;
 }

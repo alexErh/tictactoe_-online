@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import 'reflect-metadata';
 import * as session from 'express-session';
+import * as passport from 'passport';
 import * as crypto from 'crypto';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ReturnUserDto } from './users/dto/returnUserDto';
@@ -10,7 +11,10 @@ import { ReturnUserDto } from './users/dto/returnUserDto';
 declare module 'express-session' {
   interface SessionData {
     isLoggedIn?: boolean;
-    user?: ReturnUserDto;
+    user?: {
+      nickname: string;
+      isAdmin: boolean;
+    }
   }
 }
 
@@ -25,7 +29,7 @@ async function bootstrap() {
       secret: crypto.randomBytes(32).toString('hex'),
       resave: false,
       saveUninitialized: false,
-    }),
+      }),
   );
 
   const config = new DocumentBuilder()

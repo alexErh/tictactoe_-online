@@ -26,28 +26,19 @@ export class AuthController {
   @ApiResponse({ type: SignInDto })
   async signIn(@Session() session: SessionData, @Body() signInDto: SignInDto) {
     
-    await this.authService.signIn(
+    const user = await this.authService.signIn(
       signInDto.nickname,
       signInDto.password,
       session,
     );
-    console.log('singin',session)
-    return session;
+    return user;
   }
 
   @Post('logout')
   logout(@Session() session: SessionData) {
-    console.log('logout', session)
+    console.log('logout', session);
     this.authService.signOut(session);
     return { message: 'Logout successful' };
   }
 
-  /*
-  @Get('profile')
-  getProfile(@Session() session: SessionData) {
-    if (!session.isLoggedIn) {
-      throw new UnauthorizedException('You are not logged in');
-    }
-    return session.user;
-  }*/
 }

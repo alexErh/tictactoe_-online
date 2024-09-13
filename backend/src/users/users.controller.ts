@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Put, UnauthorizedException, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {Body, Controller, flatten, Get, Param, Post, Put, UnauthorizedException, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {CreateUserDto} from "./dto/createUserDto";
 import {ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -29,12 +29,20 @@ export class UsersController {
         return user;
     }
 
+    @Get(":nickname/img")
+    @ApiResponse({type: "string"})
+    async getImg(@Param("nickname") nickname: string): Promise<string> {
+        return await this.usersService.getImg(nickname);
+    }
+
     @Public()
     @Post("signup")
     @UseInterceptors(FileInterceptor('img'))
     @ApiResponse({type: ReturnUserDto})
-    async create(@Body() createUserDto: CreateUserDto, @UploadedFile() img: Express.Multer.File): Promise<ReturnUserDto>{
-        return await this.usersService.create(createUserDto, img);
+    async create(@Body() createUserDto: CreateUserDto, @UploadedFile() img: Express.Multer.File): Promise<boolean>{
+        const user = await this.usersService.create(createUserDto, img);
+
+        return user ? true : false;
     }
 
     @Put("img/:nickname")
@@ -58,4 +66,5 @@ export class UsersController {
         else
             throw new UnauthorizedException('You are not admin');
     }
+
 }

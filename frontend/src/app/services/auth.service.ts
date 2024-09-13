@@ -4,6 +4,7 @@ import { catchError, Observable, of, throwError, tap, flatMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserDto } from '../DTOs/userDto';
 import { CookieService } from 'ngx-cookie-service';
+import * as crypto from 'crypto-js';
 
 @Injectable({
   providedIn: 'root',
@@ -11,14 +12,11 @@ import { CookieService } from 'ngx-cookie-service';
 export class AuthService {
   private apiUrl = 'http://localhost:3000/auth';
   private user: UserDto = {
-    isLoggedIn: false,
-    user: {
-      id: '',
-      nickname: '',
-      score: 0,
-      img: '',
-      isAdmin: false
-    }
+    id: '',
+    nickname: '',
+    score: 0,
+    img: '',
+    isAdmin: false
   };
 
   constructor(
@@ -28,13 +26,12 @@ export class AuthService {
   ) {}
 
   signIn(nickname: string, password: string): Observable<any> {
-    return this.http.post<UserDto>(`${this.apiUrl}/login`, { nickname, password }).pipe(
+    console.log('nick: ', nickname, 'pw: ', password)
+    const pw = crypto.SHA256(password).toString(crypto.enc.Hex);
+    return this.http.post<UserDto>(`${this.apiUrl}/login`, { nickname: nickname, password: pw }, {withCredentials: true}).pipe(
       tap(response => {
-        console.log('singIn', nickname)
-        console.log('res', response)
-        console.log('cookie', document.cookie)
-        this.cookieService.set('authCookie', nickname);
         this.setCurrentUser(response);
+        console.log(this.user);
       }),
       catchError((error) => {
         console.error('Anmeldung fehlgeschlagen', error);
@@ -44,21 +41,18 @@ export class AuthService {
   }
 
   signOut(): Observable<any> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/logout`, {sessionStorage}).pipe(
+    return this.http.post<{ message: string }>(`${this.apiUrl}/logout`, {}, {withCredentials: true}).pipe(
       catchError((error) => {
         console.error('Abmeldung fehlgeschlagen', error);
         return throwError(() => new Error('Abmeldung fehlgeschlagen'));
       }),
       tap(() => {
         this.user = {
-          isLoggedIn: false,
-          user: {
-            id: '',
-            nickname: '',
-            score: 0,
-            img: '',
-            isAdmin: false
-          }
+          id: '',
+          nickname: '',
+          score: 0,
+          img: '',
+          isAdmin: false
         };
         localStorage.removeItem('adminNickname');
         this.router.navigate(['/login']); // Weiterleitung zur Login-Seite
@@ -69,20 +63,16 @@ export class AuthService {
   setCurrentUser(user: UserDto): void {
     this.user = user;
     
-    console.log('setCUrrentUser', user.user.nickname)
-
-    sessionStorage.setItem('nickname', user.user.nickname);
-    sessionStorage.setItem('isAdmin', user.user.isAdmin ? 'admin' : 'user');
-    sessionStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('adminNickname', user.user.nickname);
+    
+    localStorage.setItem('adminNickname', user.nickname);
   }
 
   isAdmin(): boolean {
-    return this.user.user.isAdmin || localStorage.getItem('adminNickname') === 'admin';
+    return this.user.isAdmin || localStorage.getItem('adminNickname') === 'admin';
   }
 
   getAdminNickname(): string | null {
-    return this.user.user.nickname || localStorage.getItem('adminNickname');
+    return this.user.nickname || localStorage.getItem('adminNickname');
   }
 
   getUser(): UserDto {

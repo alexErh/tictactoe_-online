@@ -1,15 +1,10 @@
 
 export interface UserDto {  
-    isLoggedIn: boolean;
-    user: {
-        id: string;
+    
+    id: string;
+    nickname: string;
+    score: number;
+    img: string;
+    isAdmin: boolean;
 
-        nickname: string;
-
-        score: number;
-
-        img: string;
-
-        isAdmin: boolean;
-    }
-  }
+}

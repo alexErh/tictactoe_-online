@@ -50,6 +50,10 @@ export class UsersService {
       return this.returnUser(user);
   }
 
+  async getImg(nickname: string): Promise<string> {
+    return (await this.userRepository.findOne({ where: {nickname: nickname}})).img.toString('base64');
+  }
+
     async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<ReturnUserDto> {
         const newUser: User = new User();
         

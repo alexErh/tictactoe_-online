@@ -13,12 +13,12 @@ export class AdminGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.authService.isAdmin()) {
-      this.authService.setAdminNickname('AdminUserNickname');
+      //this.authService.setAdminNickname('AdminUserNickname');
       return true;
     } else {
-      throw('Sie sind kein Admin!', 'OK', {
+      /* throw('Sie sind kein Admin!', 'OK', {
         duration: 3000,
-      });
+      }); */
       return false;
     }
   }
