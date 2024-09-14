@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../services/admin.service';
 import { AuthService } from '../services/auth.service';
-import { NavigationComponent } from '../navigation/navigation.component'; // AuthService importieren
+import { NavigationComponent } from '../navigation/navigation.component';
+import { NgClass } from '@angular/common'; // AuthService importieren
 
 @Component({
   selector: 'app-admin',
@@ -10,6 +11,7 @@ import { NavigationComponent } from '../navigation/navigation.component'; // Aut
   styleUrls: ['./admin.component.css'],
   imports: [
     NavigationComponent,
+    NgClass,
   ],
 })
 export class AdminComponent implements OnInit {
@@ -17,6 +19,9 @@ export class AdminComponent implements OnInit {
   games: any[] = [];
   queue: any[] = [];
   adminNickname: string | null = null;
+  isPlayersVisible = true;
+  isGamesVisible = false;
+  isQueueVisible = false;
 
   constructor(
     private adminService: AdminService,
@@ -32,6 +37,24 @@ export class AdminComponent implements OnInit {
     } else {
       console.error('Admin nickname is not available.');
     }
+  }
+
+  togglePlayers() {
+    this.isPlayersVisible = !this.isPlayersVisible;
+    this.isGamesVisible = false; // Schließt andere Abschnitte
+    this.isQueueVisible = false;
+  }
+
+  toggleGames() {
+    this.isGamesVisible = !this.isGamesVisible;
+    this.isPlayersVisible = false; // Schließt andere Abschnitte
+    this.isQueueVisible = false;
+  }
+
+  toggleQueue() {
+    this.isQueueVisible = !this.isQueueVisible;
+    this.isPlayersVisible = false;
+    this.isGamesVisible = false;
   }
 
   loadUsers(): void {
