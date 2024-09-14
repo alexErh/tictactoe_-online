@@ -21,29 +21,23 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     // Überprüfe, ob der angemeldete Benutzer ein Admin ist
-    this.authService.isAdmin().subscribe({
-      next: (isAdmin) => {
-        if (isAdmin) {
-          const currentUser = this.authService.getUser();
-          const nickname = currentUser.nickname;
+    const isAdmin = this.authService.isAdmin();
+    if (isAdmin) {
+      const currentUser = this.authService.getUser();
+      const nickname = currentUser.nickname;
 
-          if (nickname) {
-            this.adminNickname = nickname;
+      if (nickname) {
+        this.adminNickname = nickname;
 
-            this.loadUsers();
-            this.loadGames();
-            this.loadQueue();
-          } else {
-            console.error('Nickname not found in AuthService');
-          }
-        } else {
-          console.error('User is not an admin');
-        }
-      },
-      error: (err) => {
-        console.error('Error checking admin status:', err);
+        this.loadUsers();
+        this.loadGames();
+        this.loadQueue();
+      } else {
+        console.error('Nickname not found in AuthService');
       }
-    });
+    } else {
+      console.error('User is not an admin');
+    }
   }
 
   loadUsers(): void {
@@ -52,7 +46,7 @@ export class AdminComponent implements OnInit {
         next: (data) => {
           this.users = data;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load users:', err);
         },
       });
@@ -65,7 +59,7 @@ export class AdminComponent implements OnInit {
         next: (data) => {
           this.games = data;
         },
-        error: (err) => {
+        error: (err : any) => {
           console.error('Failed to load games:', err);
         },
       });
@@ -78,7 +72,7 @@ export class AdminComponent implements OnInit {
         next: (data) => {
           this.queue = data;
         },
-        error: (err) => {
+        error: (err : any) => {
           console.error('Failed to load queue:', err);
         },
       });

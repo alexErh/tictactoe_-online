@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';  // Importiere AuthService
+import { AuthService } from '../services/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { tap } from 'rxjs';
 import { UserDto } from '../DTOs/userDto';

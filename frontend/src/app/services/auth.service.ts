@@ -27,7 +27,7 @@ export class AuthService {
 
   signIn(nickname: string, password: string): Observable<any> {
     const pw = crypto.SHA256(password).toString(crypto.enc.Hex);
-    return this.http.post<UserDto>(`${this.apiUrl}/login`, { nickname: nickname, password: pw }, {withCredentials: true}).pipe(
+    return this.http.post<UserDto>(`${this.apiUrl}/login`, { nickname: nickname, password: password }, {withCredentials: true}).pipe(
       tap(response => {
         this.setCurrentUser(response);
       }),

@@ -17,12 +17,11 @@ import { SessionData } from 'express-session';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 import { UsersService } from 'src/users/users.service';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private usersService: UsersService
+    private usersService: UsersService,
   ) {}
 
   @Public()
@@ -50,5 +49,4 @@ export class AuthController {
   async getMe(@Session() session: SessionData) {
     return this.authService.getMe(session);
   }
-
 }
