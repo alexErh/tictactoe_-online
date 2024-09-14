@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { UserDto } from '../DTOs/userDto';
 import { AuthService } from './auth.service';
@@ -53,7 +53,7 @@ export class ProfileService {
   }
 
   getProfileImage(nickname: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/users/${nickname}/img`, { responseType: 'blob' }).pipe(
+    return this.http.get(`http://localhost:3000/users/${nickname}/img`, { responseType: 'blob' }).pipe(
       catchError(error => {
         console.error('Error fetching profile image:', error);
         return throwError(() => new Error('Error fetching profile image'));

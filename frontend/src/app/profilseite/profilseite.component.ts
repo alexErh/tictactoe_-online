@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ProfileService } from '../services/profile.service';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { HttpEventType } from '@angular/common/http';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { catchError, Observable, of, switchMap } from 'rxjs';
 import { UserDto } from '../DTOs/userDto';
@@ -38,7 +37,6 @@ export class ProfilseiteComponent implements OnInit {
   playerStats: PlayerStats | null = null;
   gameHistory: any[] = [];
   profileForm: FormGroup;
-  uploadProgress: number = 0;
   profileImage: string | null = null;
   defaultProfileImage: string = 'assets/portrait.jpg';
   isStatsLoaded: boolean = false;
@@ -71,24 +69,26 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   loadPlayerStats() {
-    this.profileService.getPlayerStats().subscribe({
-      next: (data: PlayerStats) => {
-        this.playerStats = {
-          nickname: data.nickname || '',
-          score: data.score || 0,
-          isAdmin: data.isAdmin || false,
-          img: data.img ? URL.createObjectURL(new Blob([data.img])) : this.defaultProfileImage,
-          wins: data.wins || 0,
-          losses: data.losses || 0,
-        };
-        this.profileImage = this.playerStats.img || this.defaultProfileImage;
-        this.loadGameStatistics();
-      },
-      error: (error) => {
-        console.error('Error loading player stats:', error);
-        alert('Fehler beim Laden der Spielerstatistiken.');
-      }
-    });
+    if (this.user) {
+      this.profileService.getPlayerStats(this.user.nickname).subscribe({
+        next: (data: PlayerStats) => {
+          this.playerStats = {
+            nickname: data.nickname || '',
+            score: data.score || 0,
+            isAdmin: data.isAdmin || false,
+            img: data.img ? URL.createObjectURL(new Blob([data.img])) : this.defaultProfileImage,
+            wins: data.wins || 0,
+            losses: data.losses || 0,
+          };
+          this.profileImage = this.playerStats.img || this.defaultProfileImage;
+          this.loadGameStatistics();
+        },
+        error: (error) => {
+          console.error('Error loading player stats:', error);
+          alert('Fehler beim Laden der Spielerstatistiken.');
+        }
+      });
+    }
   }
 
   loadGameHistory() {
@@ -120,7 +120,7 @@ export class ProfilseiteComponent implements OnInit {
 
   loadProfileImage() {
     if (this.playerStats?.nickname) {
-      this.profileImage$ = this.profileService.getProfileImage().pipe(
+      this.profileImage$ = this.profileService.getProfileImage(this.playerStats.nickname).pipe(
         switchMap((blob) => {
           const reader = new FileReader();
           return new Observable<string>(observer => {
@@ -164,8 +164,9 @@ export class ProfilseiteComponent implements OnInit {
     const oldPassword = this.profileForm.value.oldPassword;
     const newPassword = this.profileForm.value.newPassword;
     const confirmation = this.profileForm.value.confirmation;
-    if (this.profileForm.valid && newPassword === confirmation && this.user) {
-      this.profileService.changePassword(this.user?.nickname, oldPassword, newPassword).subscribe({
+
+    if (this.profileForm.valid && newPassword === confirmation && this.user && this.user.nickname) {
+      this.profileService.changePassword(this.user.nickname, oldPassword, newPassword).subscribe({
         next: () => {
           alert('Passwort erfolgreich geändert');
           this.profileForm.reset();
@@ -176,7 +177,7 @@ export class ProfilseiteComponent implements OnInit {
         }
       });
     } else {
-      alert('Das Formular ist ungültig.');
+      alert('Das Formular ist ungültig oder der Benutzer ist nicht angemeldet.');
     }
   }
 
@@ -188,7 +189,7 @@ export class ProfilseiteComponent implements OnInit {
   onFileUpload() {
     if (this.selectedFile) {
       // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
-      
+
 
       this.profileService.uploadProfileImage(this.selectedFile).subscribe({
         next: () => {

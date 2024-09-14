@@ -20,7 +20,7 @@ export class AuthService {
   };
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
     private cookieService: CookieService
   ) {}
@@ -62,15 +62,15 @@ export class AuthService {
           isAdmin: false
         };
         localStorage.removeItem('adminNickname');
-        this.router.navigate(['/login']); // Weiterleitung zur Login-Seite
+        this.router.navigate(['/register']);
       })
     );
   }
 
   setCurrentUser(user: UserDto): void {
     this.user = user;
-    
-    
+
+
     localStorage.setItem('adminNickname', user.nickname);
   }
 

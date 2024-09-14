@@ -7,7 +7,6 @@ import { MatchGateway } from './match/match.gateway';
 import { MatchService } from './match/match.service';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './database/tables/GameEntity';
-import { ProfileModule } from './profile/profile.module';
 import { AdminGuard } from './admin/admin.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -30,7 +29,6 @@ import { join } from 'path';
     UsersModule,
     GameModule,
     UsersModule,
-    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService, MatchGateway, MatchService, AdminGuard],
