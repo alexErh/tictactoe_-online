@@ -17,7 +17,7 @@ export class RegistrationService {
 
   signup(nickname: string, password: string) {
     const pw = crypto.SHA256(password).toString(crypto.enc.Hex);
-    console.log(pw)
+
     return this.http.post(`${this.apiUrl}/signup`, { nickname, password: pw}).pipe(
       map(() => true),
       catchError(() => of(false))

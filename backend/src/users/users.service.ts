@@ -23,21 +23,20 @@ export class UsersService {
   ) {}
 
   async getAuthData(nickname: string): Promise<AuthDataDto> {
-    const user = await this.userRepository.findOne({
-      where: { nickname: nickname },
-    });
-    if (!user) throw new NotFoundException();
+    const user = await this.userRepository.findOne({ where: { nickname: nickname }});
+    if (!user)
+      throw new NotFoundException();
     return {
       id: user.id,
       nickname: user.nickname,
       password: user.password,
-      isAdmin: user.isAdmin,
-    };
+      isAdmin: user.isAdmin
+    }
   }
 
   async getAll(): Promise<ReturnUserDto[]> {
-    return (await this.userRepository.find()).map((e) => {
-      return this.returnUser(e);
+    return (await this.userRepository.find()).map(e => {
+      return this.returnUser(e)
     });
   }
 
@@ -55,38 +54,31 @@ export class UsersService {
     ).img.toString('base64');
   }
 
-  async create(
-    createUserDto: CreateUserDto,
-    img?: Express.Multer.File,
-  ): Promise<ReturnUserDto> {
-    const newUser: User = new User();
-
-    newUser.nickname = createUserDto.nickname;
-    newUser.password = createUserDto.password;
-    newUser.img = img ? img.buffer : readFileSync(this.avatar_placeholder_path); //saving avatar placeholder if image was't uploaded
+    async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<ReturnUserDto> {
+        const newUser: User = new User();
+        
+        newUser.nickname = createUserDto.nickname;
+        newUser.password = createUserDto.password;
+        newUser.img =  img ? img.buffer : readFileSync(this.avatar_placeholder_path); //saving avatar placeholder if image was't uploaded
 
     const existingUser: User = await this.userRepository.findOne({
       where: { nickname: newUser.nickname },
     });
 
     if (existingUser)
-      throw new ConflictException(
-        `User with nickname ${existingUser.nickname} already exists`,
-      );
+      throw new ConflictException(`User with nickname ${existingUser.nickname} already exists`);
 
     const createdUser: User = await this.userRepository.save(newUser);
-    return this.returnUser(createdUser);
+    return this.returnUser(createdUser)
   }
 
   async updateScore(updateUserDto: UpdateScoreDto): Promise<ReturnUserDto> {
     const userToUpdate: User = await this.userRepository.findOne({
-      where: { nickname: updateUserDto.nickname },
+      where: { nickname: updateUserDto.nickname }
     });
 
     if (!userToUpdate) {
-      throw new NotFoundException(
-        `User with nickname ${updateUserDto.nickname} not found`,
-      );
+      throw new NotFoundException(`User with nickname ${updateUserDto.nickname} not found`);
     }
 
     userToUpdate.score = updateUserDto.score;
@@ -97,27 +89,22 @@ export class UsersService {
 
   async updatePW(data: UpdatePasswordDto): Promise<ReturnUserDto> {
     const user: User = await this.userRepository.findOne({
-      where: { nickname: data.nickname },
+      where: { nickname: data.nickname }
     });
-
-    if (!user)
-      throw new NotFoundException(
-        `User with nickname ${data.nickname} not found`,
-      );
-    else if (user.password !== data.oldPW)
+    console.log(user)
+    if(!user)
+      throw new NotFoundException(`User with nickname ${data.nickname} not found`);
+    else if(user.password !== data.oldPW)
       throw new ConflictException('The old password is false.');
     else {
       user.password = data.newPW;
-      return this.returnUser(user);
+      return this.returnUser(await this.userRepository.save(user));
     }
   }
 
-  async updateImg(
-    nickname: string,
-    img: Express.Multer.File,
-  ): Promise<ReturnUserDto> {
+  async updateImg(nickname: string, img: Express.Multer.File): Promise<ReturnUserDto> {
     const userToUpdate: User = await this.userRepository.findOne({
-      where: { nickname: nickname },
+      where: { nickname: nickname }
     });
 
     userToUpdate.img = img.buffer;
@@ -127,10 +114,10 @@ export class UsersService {
 
   async updateToAdmin(nickname: string): Promise<ReturnUserDto> {
     const userToUpdate: User = await this.userRepository.findOne({
-      where: { nickname: nickname },
+      where: { nickname: nickname }
     });
     userToUpdate.isAdmin = true;
-    return this.returnUser(await this.userRepository.save(userToUpdate));
+    return this.returnUser(await this.userRepository.save(userToUpdate))
   }
 
   async isAdmin(nickname: string): Promise<boolean> {

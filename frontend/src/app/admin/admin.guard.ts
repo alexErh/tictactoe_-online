@@ -8,14 +8,18 @@ import { AuthService } from '../services/auth.service';
 export class AdminGuard implements CanActivate {
   constructor(
     private authService: AuthService,
+    private router: Router,
   ) {}
 
   canActivate(): boolean {
-    if (this.authService.isAdmin()) {
+    if (this.authService.isAdmin())
       return true;
-    } else {
-      return false;
-    }
+
+    this.router.navigate(['/start'], {
+      state: { message: 'Sie haben keine Admin-Berechtigungen.'}
+    });
+    return false;
+
   }
 }
 

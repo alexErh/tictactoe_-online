@@ -13,7 +13,15 @@ import {  ProfileService } from './services/profile.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RegistrationComponent, LoginComponent, MatchmakingQueueComponent, SpielseiteComponent, ProfilseiteComponent, NavigationComponent,],
+  imports: [
+    RouterOutlet, 
+    RegistrationComponent, 
+    LoginComponent, 
+    MatchmakingQueueComponent, 
+    SpielseiteComponent, 
+    ProfilseiteComponent, 
+    NavigationComponent,
+  ],
   providers: [MatchmakingQueueService, ProfileService,],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

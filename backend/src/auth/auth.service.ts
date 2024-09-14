@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { SessionData } from 'express-session';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
-import * as crypto from 'crypto-js';
 
 @Injectable()
 export class AuthService {
@@ -14,22 +13,22 @@ export class AuthService {
     session: SessionData,
   ): Promise<ReturnUserDto> {
     const user = await this.usersService.getAuthData(nickname);
-
-    const hashedPassword = crypto.SHA256(pass).toString(crypto.enc.Hex);
-
-    if (!user || user.password !== hashedPassword) {
+    if (!user || user.password !== pass) {
       throw new UnauthorizedException('Ungültige Anmeldeinformationen');
     }
-
-    session.user = session.user || {};
     session.isLoggedIn = true;
-    session.user.nickname = user.nickname;
-
+    session.user = {nickname: user.nickname, isAdmin: user.isAdmin || false}
+    //in anderen Stellen (session.user.isAdmin) prüfen, ob der Nutzer die entsprechenden Rechte für einen Admin-Bereich hat.
     return await this.usersService.getOne(nickname);
   }
 
   signOut(session: SessionData): void {
     session.isLoggedIn = undefined;
-    session.user = undefined;
+  }
+
+  async getMe(session: SessionData): Promise<ReturnUserDto> {
+    if (session.isLoggedIn && session.user.nickname)
+      return await this.usersService.getOne(session.user.nickname);
+    throw new UnauthorizedException('Ungültige Anmeldeinformationen');
   }
 }

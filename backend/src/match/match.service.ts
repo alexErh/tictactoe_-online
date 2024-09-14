@@ -24,7 +24,7 @@ export class MatchService {
       return `User ${nickname} not found.`
 
     const suitablePlayer = this.waitingQueue.find(
-      e => Math.abs(e.userScore - player2.score) < 200
+      e => Math.abs(e.userScore - player2.score) < 200 && e.userNickname !== player2.nickname
     );
 
     const gameStatus = new GameStatusDto();

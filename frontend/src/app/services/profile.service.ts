@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
+import { catchError, Observable, tap, throwError } from 'rxjs';
+import { UserDto } from '../DTOs/userDto';
+import { AuthService } from './auth.service';
+import * as crypto from 'crypto-js';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
   private apiUrl = 'http://localhost:3000/profil';
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   getPlayerStats(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/stats`).pipe(
@@ -36,8 +42,10 @@ export class ProfileService {
     );
   }
 
-  changePassword(newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/change-password`, { password: newPassword }).pipe(
+  changePassword(nickname: string, oldPassword: string, newPassword: string): Observable<void> {
+    const oldHash = crypto.SHA256(oldPassword).toString(crypto.enc.Hex);
+    const newHash = crypto.SHA256(newPassword).toString(crypto.enc.Hex);
+    return this.http.put<void>(`http://localhost:3000/users/updatePW`, { nickname: nickname, oldPW: oldHash, newPW: newHash }, {withCredentials: true}).pipe(
       catchError(error => {
         console.error('Error changing password:', error);
         return throwError(() => new Error('Error changing password'));
@@ -54,11 +62,17 @@ export class ProfileService {
     );
   }
 
-  uploadProfileImage(formData: FormData): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/upload-image`, formData, {
-      reportProgress: true,
-      observe: 'events'
+  uploadProfileImage(file: File): Observable<any> {
+    const formData = new FormData();
+      formData.append('img', file, file.name);
+
+    return this.http.put<UserDto>(`http://localhost:3000/users/img/${this.authService.getUser().nickname}`, formData, {
+      withCredentials: true,
     }).pipe(
+      tap(user => {
+          if (user)
+            this.authService.setCurrentUser(user)
+      }),
       catchError(error => {
         console.error('Error uploading profile image:', error);
         return throwError(() => new Error('Error uploading profile image'));

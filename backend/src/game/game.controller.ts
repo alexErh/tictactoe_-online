@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GameEntity } from 'src/database/tables/GameEntity';
 import { GameService } from './game.service';
@@ -48,5 +48,10 @@ export class GameController {
         else
             throw new UnauthorizedException('You are not admin');
         
+    }
+
+    @Delete('/delete/:id')
+    async deleteGame(@Param("id") id: string) {
+        await this.gameService.deleteGame(id);
     }
 }

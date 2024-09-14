@@ -37,6 +37,7 @@ import { join } from 'path';
         busyTimeout: 5000,
       },
     }),
+    ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend', 'browser'),}),
     AuthModule,
     UsersModule,
     GameModule,
