@@ -21,4 +21,5 @@ export class AdminService {
   getQueue(nickname: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.gamesApiUrl}/queue/${nickname}`);
   }
+
 }

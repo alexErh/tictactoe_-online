@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';  // Importiere AuthService
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -22,14 +22,10 @@ export class LoginComponent {
   onLogin(form: any): void {
     if (form.valid) {
       this.authService.signIn(this.nickname, this.password).subscribe({
-        next: (response) => {
-          const nickname = response.nickname;
-          const isAdmin = response.isAdmin;
-
-          
+        next: () => {
           this.router.navigate(['/start']);
         },
-        error: (err) => {
+        error: () => {
           this.errorMessage = 'Benutzername oder Passwort falsch. Bitte versuchen Sie es erneut.';
         }
       });

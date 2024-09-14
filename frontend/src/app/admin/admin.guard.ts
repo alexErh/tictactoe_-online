@@ -8,17 +8,12 @@ import { AuthService } from '../services/auth.service';
 export class AdminGuard implements CanActivate {
   constructor(
     private authService: AuthService,
-    private router: Router,
   ) {}
 
   canActivate(): boolean {
     if (this.authService.isAdmin()) {
-      //this.authService.setAdminNickname('AdminUserNickname');
       return true;
     } else {
-      /* throw('Sie sind kein Admin!', 'OK', {
-        duration: 3000,
-      }); */
       return false;
     }
   }

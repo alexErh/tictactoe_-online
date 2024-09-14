@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../services/admin.service';
-import { AuthService } from '../services/auth.service'; // AuthService importieren
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin',
@@ -16,18 +16,34 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
-    this.adminNickname = this.authService.getAdminNickname();
-    if (this.adminNickname) {
-      this.loadUsers();
-      this.loadGames();
-      this.loadQueue();
-    } else {
-      console.error('Admin nickname is not available.');
-    }
+    // Überprüfe, ob der angemeldete Benutzer ein Admin ist
+    this.authService.isAdmin().subscribe({
+      next: (isAdmin) => {
+        if (isAdmin) {
+          const currentUser = this.authService.getUser();
+          const nickname = currentUser.nickname;
+
+          if (nickname) {
+            this.adminNickname = nickname;
+
+            this.loadUsers();
+            this.loadGames();
+            this.loadQueue();
+          } else {
+            console.error('Nickname not found in AuthService');
+          }
+        } else {
+          console.error('User is not an admin');
+        }
+      },
+      error: (err) => {
+        console.error('Error checking admin status:', err);
+      }
+    });
   }
 
   loadUsers(): void {
