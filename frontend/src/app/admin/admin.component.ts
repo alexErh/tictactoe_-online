@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../services/admin.service';
-import { AuthService } from '../services/auth.service'; // AuthService importieren
+import { AuthService } from '../services/auth.service';
+import { NavigationComponent } from '../navigation/navigation.component'; // AuthService importieren
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css'],
+  imports: [
+    NavigationComponent,
+  ],
 })
 export class AdminComponent implements OnInit {
   users: any[] = [];
