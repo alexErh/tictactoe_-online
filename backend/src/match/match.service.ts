@@ -1,4 +1,3 @@
-//Logik des Matchmaking: 1.finden von Gegner 2.warteschlange verwalten
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { GameService } from 'src/game/game.service';

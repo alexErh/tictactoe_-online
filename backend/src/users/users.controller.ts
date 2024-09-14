@@ -1,4 +1,16 @@
-import {Body, Controller, flatten, Get, Param, Post, Put, UnauthorizedException, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    flatten,
+    Get,
+    Header, HttpException, HttpStatus,
+    Param,
+    Post,
+    Put, Query,
+    UnauthorizedException,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {CreateUserDto} from "./dto/createUserDto";
 import {ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -16,10 +28,7 @@ export class UsersController {
     @Get("all/:nickname")
     @ApiResponse({type: [ReturnUserDto]})
     async getAll(@Param("nickname") nickname: string): Promise<ReturnUserDto[]>{
-        if (await this.usersService.isAdmin(nickname))
             return await this.usersService.getAll();
-        else
-            throw new UnauthorizedException('You are not admin');
     }
 
     @Get(":nickname")
@@ -34,6 +43,13 @@ export class UsersController {
     async getImg(@Param("nickname") nickname: string): Promise<string> {
         return await this.usersService.getImg(nickname);
     }
+
+    @Get(":nickname/stats")
+    @ApiResponse({ type: ReturnUserDto })
+    async getPlayerStats(@Param("nickname") nickname: string): Promise<ReturnUserDto> {
+        return await this.usersService.getPlayerStats(nickname);
+    }
+
 
     @Public()
     @Post("signup")
@@ -53,6 +69,7 @@ export class UsersController {
         console.log(img.buffer)
         return await this.usersService.updateImg(nickname, img);
     }
+
 
     @Put("updatePW")
     @ApiResponse({type: ReturnUserDto})

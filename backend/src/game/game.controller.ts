@@ -1,9 +1,19 @@
-import { Controller, Delete, Get, Param, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Delete,
+    Get,
+    HttpException, HttpStatus,
+    Param,
+    Session,
+    UnauthorizedException,
+    UseGuards,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GameEntity } from 'src/database/tables/GameEntity';
 import { GameService } from './game.service';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnQueueEntityDto } from 'src/match/dto/returnQueueEntityDto';
+import { GameStatisticsDto } from './dto/gameStatisticsDto';
 import { MatchService } from 'src/match/match.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -31,12 +41,7 @@ export class GameController {
     @UseGuards(AuthGuard)
     @ApiResponse({ type: [ReturnGameDto] })
     async getAllActiveGames(@Param("nickname") nickname: string): Promise<ReturnGameDto[]> {
-        const isAdmin = await this.usersService.isAdmin(nickname);
-        if (isAdmin)
-            return await this.gameService.getAllActiveGames();
-        else
-            throw new UnauthorizedException('You are not admin');
-        
+        return await this.gameService.getAllActiveGames();
     }
 
     @Get('/waiting/:nickname')
@@ -50,8 +55,31 @@ export class GameController {
         
     }
 
+    @Get('/history')
+    @UseGuards(AuthGuard)
+    @ApiResponse({ type: [GameEntity] })
+    async getGameHistory(@Session() session: Record<string, any>) {
+        const nickname = session.user?.nickname;
+        if (!nickname) {
+            throw new HttpException('Benutzer nicht angemeldet', HttpStatus.UNAUTHORIZED);
+        }
+        return await this.gameService.getGameHistory(nickname);
+    }
+
+    @Get('/statistics')
+    @UseGuards(AuthGuard)
+    @ApiResponse({ type: GameStatisticsDto })
+    async getGameStatistics(@Session() session: Record<string, any>): Promise<GameStatisticsDto> {
+        const nickname = session.user?.nickname;
+        if (!nickname) {
+            throw new HttpException('Benutzer nicht angemeldet', HttpStatus.UNAUTHORIZED);
+        }
+        return await this.gameService.getGameStatistics(nickname);
+    }
+
     @Delete('/delete/:id')
     async deleteGame(@Param("id") id: string) {
         await this.gameService.deleteGame(id);
     }
+
 }

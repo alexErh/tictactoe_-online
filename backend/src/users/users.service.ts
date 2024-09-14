@@ -1,5 +1,5 @@
 import {
-  ConflictException,
+  ConflictException, HttpException, HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import { ReturnUserDto } from './dto/returnUserDto';
 import { AuthDataDto } from './dto/authDataDto';
 import { UpdatePasswordDto } from './dto/updatePasswordDto';
+import { Buffer } from 'buffer';
 
 @Injectable()
 export class UsersService {
@@ -50,11 +51,20 @@ export class UsersService {
       return this.returnUser(user);
   }
 
+  async getPlayerStats(nickname: string): Promise<ReturnUserDto> {
+    const user = await this.userRepository.findOne({ where: { nickname: nickname } });
+    if (!user) {
+      throw new NotFoundException(`User with nickname ${nickname} not found`);
+    }
+
+    return this.returnUser(user);
+  }
+
   async getImg(nickname: string): Promise<string> {
     return (await this.userRepository.findOne({ where: {nickname: nickname}})).img.toString('base64');
   }
 
-    async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<ReturnUserDto> {
+  async create(createUserDto: CreateUserDto, img?: Express.Multer.File): Promise<ReturnUserDto> {
         const newUser: User = new User();
         
         newUser.nickname = createUserDto.nickname;

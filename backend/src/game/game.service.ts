@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from 'src/database/tables/GameEntity';
 import { User } from 'src/database/tables/User';
@@ -8,6 +8,7 @@ import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 import { Board } from './Board';
+import { GameStatisticsDto } from './dto/GameStatisticsDto';
 
 @Injectable()
 export class GameService {
@@ -99,5 +100,56 @@ export class GameService {
       } else {
         return winner;
       }
+    }
+
+    async getGameHistory(nickname: string) {
+        try {
+            const user = await this.userRepository.findOne({
+                where: { nickname: nickname },
+            });
+
+            if (!user) {
+                throw new HttpException('Benutzer nicht gefunden', HttpStatus.NOT_FOUND);
+            }
+
+            const history = await this.gameRepository.find({
+                where: [{ player1: user }, { player2: user }],
+            });
+
+            return history;
+        } catch (error) {
+            throw new HttpException(
+              'Fehler beim Abrufen der Spielhistorie',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    async getGameStatistics(nickname: string): Promise<GameStatisticsDto> {
+        try {
+            const user = await this.userRepository.findOne({
+                where: { nickname: nickname },
+            });
+
+            if (!user) {
+                throw new HttpException('Benutzer nicht gefunden', HttpStatus.NOT_FOUND);
+            }
+
+            const games = await this.gameRepository.find({
+                where: [{ player1: user }, { player2: user }],
+            });
+
+            const wins = games.filter((game) => game.winner === user.nickname).length;
+            const losses = games.filter(
+              (game) => game.winner && game.winner !== user.nickname,
+            ).length;
+
+            return { wins, losses }; // Return the statistics directly
+        } catch (error) {
+            throw new HttpException(
+              'Fehler beim Abrufen der Spielstatistik',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
     }
 }

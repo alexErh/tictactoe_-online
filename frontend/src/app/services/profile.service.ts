@@ -9,14 +9,13 @@ import * as crypto from 'crypto-js';
   providedIn: 'root'
 })
 export class ProfileService {
-  private apiUrl = 'http://localhost:3000/profil';
   constructor(
     private http: HttpClient,
     private authService: AuthService
   ) { }
 
-  getPlayerStats(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/stats`).pipe(
+  getPlayerStats(nickname: string): Observable<any> {
+    return this.http.get<any>(`http://localhost:3000/users/${nickname}/stats`).pipe(
       catchError(error => {
         console.error('Error fetching player stats:', error);
         return throwError(() => new Error('Error fetching player stats'));
@@ -25,7 +24,7 @@ export class ProfileService {
   }
 
   getGameHistory(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/history`).pipe(
+    return this.http.get<any[]>(`http://localhost:3000/game/history`).pipe(
       catchError(error => {
         console.error('Error fetching game history:', error);
         return throwError(() => new Error('Error fetching game history'));
@@ -34,7 +33,7 @@ export class ProfileService {
   }
 
   getGameStatistics(): Observable<{ wins: number; losses: number }> {
-    return this.http.get<{ wins: number; losses: number }>(`${this.apiUrl}/statistics`).pipe(
+    return this.http.get<{ wins: number; losses: number }>(`http://localhost:3000/game/statistics`).pipe(
       catchError(error => {
         console.error('Error fetching game statistics:', error);
         return throwError(() => new Error('Error fetching game statistics'));
@@ -53,8 +52,8 @@ export class ProfileService {
     );
   }
 
-  getProfileImage(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/profile-image`, { responseType: 'blob' }).pipe(
+  getProfileImage(nickname: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/users/${nickname}/img`, { responseType: 'blob' }).pipe(
       catchError(error => {
         console.error('Error fetching profile image:', error);
         return throwError(() => new Error('Error fetching profile image'));
