@@ -45,16 +45,19 @@ export class UsersController {
         return user ? true : false;
     }
 
+    @Public()
     @Put("img/:nickname")
     @UseInterceptors(FileInterceptor('img'))
     @ApiResponse({type: ReturnUserDto})
     async updateImg(@Param("nickname") nickname: string, @UploadedFile() img: Express.Multer.File): Promise<ReturnUserDto> {
+        console.log(img.buffer)
         return await this.usersService.updateImg(nickname, img);
     }
 
     @Put("updatePW")
     @ApiResponse({type: ReturnUserDto})
     async updatePassword(@Body() data: UpdatePasswordDto): Promise<ReturnUserDto> {
+        console.log(data)
         return await this.usersService.updatePW(data);
     }
 

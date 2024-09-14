@@ -5,11 +5,11 @@
     <main class="col-md-9">
       <div class="profile-container mt-0">
         <div class="text-center mt-5">
-          <h1>Willkommen zu Tic Tac Toe</h1>
+          <h1>{{user?.nickname + ", willkommen zu Tic Tac Toe"}}</h1>
 
           <!-- Anzeige der Elo-Zahl -->
           <div class="player-info mt-4">
-            <p>Aktuelle Elo-Zahl: {{ playerElo }}</p>
+            <p>Aktuelle Elo-Zahl: {{ user?.score }}</p>
           </div>
 
           <button class="btn btn-primary btn-lg mt-4" (click)="playNow()">Jetzt Spielen</button>

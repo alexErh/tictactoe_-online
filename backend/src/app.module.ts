@@ -11,6 +11,8 @@ import { ProfileModule } from './profile/profile.module';
 import { AdminGuard } from './admin/admin.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { AppService } from './app.service';
         busyTimeout: 5000,
       },
     }),
+    ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend', 'browser'),}),
     AuthModule,
     UsersModule,
     GameModule,

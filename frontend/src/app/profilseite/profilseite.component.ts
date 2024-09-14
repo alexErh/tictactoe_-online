@@ -6,6 +6,8 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HttpEventType } from '@angular/common/http';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { catchError, Observable, of, switchMap } from 'rxjs';
+import { UserDto } from '../DTOs/userDto';
+import { AuthService } from '../services/auth.service';
 
 interface PlayerStats {
   nickname: string;
@@ -44,16 +46,24 @@ export class ProfilseiteComponent implements OnInit {
   isSettingsLoaded: boolean = false;
   profileImage$: Observable<string>;
   public profileService: ProfileService = inject(ProfileService);
+  public user: UserDto | undefined;
+  public selectedFile: File | undefined;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
     this.profileImage$ = new Observable<string>();
     this.profileForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      oldPassword: ['', [Validators.required,]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmation: ['', [Validators.required, Validators.minLength(6)]],
       file: [null],
     });
   }
 
   ngOnInit() {
+    this.user = this.authService.getUser();
     this.loadProfileImage();
     this.loadPlayerStats();
     this.loadGameHistory();
@@ -151,8 +161,11 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   onPasswordChange() {
-    if (this.profileForm.valid) {
-      this.profileService.changePassword(this.profileForm.value.password).subscribe({
+    const oldPassword = this.profileForm.value.oldPassword;
+    const newPassword = this.profileForm.value.newPassword;
+    const confirmation = this.profileForm.value.confirmation;
+    if (this.profileForm.valid && newPassword === confirmation && this.user) {
+      this.profileService.changePassword(this.user?.nickname, oldPassword, newPassword).subscribe({
         next: () => {
           alert('Passwort erfolgreich geändert');
           this.profileForm.reset();
@@ -168,15 +181,18 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
-      const formData = new FormData();
-      formData.append('file', file);
+    this.selectedFile = event.target.files[0];
+    console.log(this.selectedFile !== undefined)
+  }
 
-      this.profileService.uploadProfileImage(formData).subscribe({
+  onFileUpload() {
+    if (this.selectedFile) {
+      // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
+      
+
+      this.profileService.uploadProfileImage(this.selectedFile).subscribe({
         next: () => {
-          alert('Profilbild erfolgreich hochgeladen!');
+          this.user = this.authService.getUser()
         },
         error: (error) => {
           console.error('Error uploading profile image:', error);

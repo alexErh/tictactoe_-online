@@ -26,18 +26,25 @@ export class AuthService {
   ) {}
 
   signIn(nickname: string, password: string): Observable<any> {
-    console.log('nick: ', nickname, 'pw: ', password)
     const pw = crypto.SHA256(password).toString(crypto.enc.Hex);
     return this.http.post<UserDto>(`${this.apiUrl}/login`, { nickname: nickname, password: pw }, {withCredentials: true}).pipe(
       tap(response => {
         this.setCurrentUser(response);
-        console.log(this.user);
       }),
       catchError((error) => {
         console.error('Anmeldung fehlgeschlagen', error);
         return throwError(() => new Error('Anmeldung fehlgeschlagen'));
       })
     );
+  }
+
+  signInWithSession() {
+    this.http.get<UserDto>(`${this.apiUrl}/me`, {withCredentials: true}).subscribe({
+      next: (data) => {
+        this.user = data;
+        this.router.navigate(['/start'])
+      }
+    })
   }
 
   signOut(): Observable<any> {
@@ -68,11 +75,16 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    return this.user.isAdmin || localStorage.getItem('adminNickname') === 'admin';
+    console.log('isAdmin', this.isUserLogged() && this.user.isAdmin)
+    return this.isUserLogged() && this.user.isAdmin;
+  }
+
+  isUserLogged(): boolean {
+    return this.user.nickname.length !== 0;
   }
 
   getAdminNickname(): string | null {
-    return this.user.nickname || localStorage.getItem('adminNickname');
+    return this.user.nickname;
   }
 
   getUser(): UserDto {

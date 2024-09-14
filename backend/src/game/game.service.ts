@@ -65,6 +65,13 @@ export class GameService {
         return this.returnGame(updatedGame);
     }
 
+    async deleteGame(id: string) {
+        const game = await this.gameRepository.findOne({where: {id: id}});
+        if (game.winner && game.winner !== '')
+            throw new ConflictException("You can't delete this game entity. Winner already exist.")
+        this.gameRepository.remove(game);
+    }
+
     private returnGame(game: GameEntity): ReturnGameDto {
         const player1 = new ReturnUserDto();
         player1.id = game.player1.id;
