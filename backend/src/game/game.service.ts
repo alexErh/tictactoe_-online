@@ -106,6 +106,27 @@ export class GameService {
     if (game.winner.trim().length <= 0)
       throw new ConflictException(`Winner already exist.`);
 
+    const player1: User = game.player1;
+    const player2: User = game.player2;
+    const k = 20;
+    //Berechnung von der Partiepunktzahl von beiden Spieler
+    let s_player1 = data.winner === player1.nickname ? 1 : 0;
+    s_player1 = data.winner === 'Draw' ? 0.5 : s_player1;
+    let s_player2 = data.winner === player2.nickname ? 1 : 0;
+    s_player2 = data.winner === 'Draw' ? 0.5 : s_player2;
+    //Berechnung von dem Erwartungswerd der beiden Spieler
+    const e_player1 = 1 / (1 + 10 ** ((player2.score-player1.score) / 400));
+    const e_player2 = 1 / (1 + 10 ** ((player1.score-player2.score) / 400));
+    //Die resultierende Elo-Zahl
+    const r1_player1 = player1.score + k * (s_player1 - e_player1);
+    const r1_player2 = player2.score + k * (s_player2 - e_player2);
+    
+    player1.score = r1_player1;
+    this.userRepository.save(player1);
+    
+    player2.score = r1_player2;
+    this.userRepository.save(player2);
+    
     game.winner = data.winner;
     const updatedGame = await this.gameRepository.save(game);
     return this.returnGame(updatedGame);
