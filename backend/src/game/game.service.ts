@@ -45,16 +45,17 @@ export class GameService {
   }
 
   async getAllActiveGames(): Promise<ReturnGameDto[]> {
-    return (
-      await this.gameRepository.find({
-        where: {
-          player1: Not(IsNull()),
-          player2: Not(IsNull()),
-          winner: IsNull(),
-        },
-      })
-    ).map((e) => {
-      return this.returnGame(e);
+    const games = await this.gameRepository.find({
+      where: {
+        player1: Not(IsNull()),
+        player2: Not(IsNull()),
+        winner: IsNull(),
+      },
+      relations: ['player1', 'player2'], // Spieler-Relationen mitladen
+    });
+
+    return games.map((game) => {
+      return this.returnGame(game);
     });
   }
 
