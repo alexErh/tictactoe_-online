@@ -97,9 +97,8 @@ export class ProfilseiteComponent implements OnInit {
         next: (data) => {
           this.gameHistory = data.map((game: any) => ({
             id: game.id,
-            player1: game.player1,
-            player2: game.player2,
-            currentTurn: game.currentTurn,
+            player1: game.player1.nickname,
+            player2: game.player2.nickname,
             winner: game.winner,
           }));
           this.isHistoryLoaded = true;
