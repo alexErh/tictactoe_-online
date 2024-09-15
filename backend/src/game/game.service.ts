@@ -14,8 +14,11 @@ import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 import { Board } from './Board';
-import { QueueEntityDto } from 'src/match/dto/queueEntityDto';
-import { ReturnQueueEntityDto } from 'src/match/dto/returnQueueEntityDto';
+import { QueueEntityDto } from './dto/queueEntityDto';
+import { ReturnQueueEntityDto } from './dto/returnQueueEntityDto';
+import { GameStatusDto } from './dto/gameStatusDto';
+import { UsersService } from 'src/users/users.service';
+import { PlayerDto } from 'src/users/dto/playerDto';
 
 
 @Injectable()
@@ -28,6 +31,7 @@ export class GameService {
       private readonly gameRepository: Repository<GameEntity>,
       @InjectRepository(User)
       private readonly userRepository: Repository<User>,
+      private readonly usersService: UsersService,
     ) {}
 
     async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
@@ -62,29 +66,6 @@ export class GameService {
     return games.map((game) => {
       return this.returnGame(game);
     });
-  }
-
-  getWaitingPlayers(): ReturnQueueEntityDto[] {
-    return this.waitingQueue.map(e => {
-        return {
-            userNickname: e.userNickname,
-            userScore: e.userScore
-        }
-    })
-  }
-
-  getWaitingQueue(): QueueEntityDto[] {
-    return this.waitingQueue;
-  }
-
-  pushPlayerToQueue(data: QueueEntityDto) {
-    this.waitingQueue.push(data);
-  }
-
-  popPlayerFromQueue(cliendId: string): boolean {
-    const oldLength = this.waitingQueue.length;
-    this.waitingQueue = this.waitingQueue.filter(e => e.clientId !== cliendId);
-    return this.waitingQueue.length < oldLength ? true : false;
   }
 
   async createGame(data: CreateGameDto): Promise<ReturnGameDto> {
@@ -168,6 +149,85 @@ export class GameService {
       player2: player2,
       winner: game.winner,
     };
+  }
+
+  getWaitingPlayers(): ReturnQueueEntityDto[] {
+    return this.waitingQueue.map(e => {
+        return {
+            userNickname: e.userNickname,
+            userScore: e.userScore
+        }
+    })
+  }
+
+  async joinPlayersQueue(
+    clientId: string,
+    nickname: string,
+  ): Promise<GameStatusDto | string> {
+    const player2 = await this.usersService.getOne(nickname);
+    if (!player2) return `User ${nickname} not found.`;
+
+
+    const suitablePlayer = this.waitingQueue.find(
+      (e) =>
+        Math.abs(e.userScore - player2.score) < 200 &&
+        e.userNickname !== player2.nickname,
+    );
+
+    const gameStatus = new GameStatusDto();
+
+    if (suitablePlayer) {
+      gameStatus.nextPlayer = Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
+
+      this.popPlayerFromQueue(suitablePlayer.clientId);
+
+      const player_1: PlayerDto = {
+        clientId: suitablePlayer.clientId,
+        nickname: suitablePlayer.userNickname,
+        score: suitablePlayer.userScore,
+        symbol:
+          gameStatus.nextPlayer === suitablePlayer.userNickname ? 'X' : 'O',
+      };
+
+      const player_2: PlayerDto = {
+        clientId: clientId,
+        nickname: player2.nickname,
+        score: player2.score,
+        symbol: gameStatus.nextPlayer === player2.nickname ? 'X' : 'O',
+      };
+      const data: CreateGameDto = new CreateGameDto();
+      data.player1 = player_1.nickname;
+      data.player2 = player_2.nickname;
+
+      gameStatus.player1 = player_1;
+      gameStatus.player2 = player_2;
+
+      gameStatus.id = (await this.createGame(data)).id;
+      return gameStatus;
+    } else {
+      const e: QueueEntityDto = new QueueEntityDto();
+      e.clientId = clientId;
+      e.userNickname = player2.nickname;
+      e.userScore = player2.score;
+      if(!this.waitingQueue.some(item => item.userNickname === e.userNickname)) {
+        this.pushPlayerToQueue(e)
+      }
+      return null;
+    }
+  }
+
+  getWaitingQueue(): QueueEntityDto[] {
+    return this.waitingQueue;
+  }
+
+  pushPlayerToQueue(data: QueueEntityDto) {
+    this.waitingQueue.push(data);
+  }
+
+  popPlayerFromQueue(cliendId: string): boolean {
+    const oldLength = this.waitingQueue.length;
+    this.waitingQueue = this.waitingQueue.filter(e => e.clientId !== cliendId);
+    return this.waitingQueue.length < oldLength ? true : false;
   }
 
   getWinner(board: Board): string {

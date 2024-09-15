@@ -3,8 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './database/tables/User';
-import { MatchGateway } from './match/match.gateway';
-import { MatchService } from './match/match.service';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './database/tables/GameEntity';
 import { AdminGuard } from './helpers/guards/admin.guard';
@@ -31,6 +29,6 @@ import { join } from 'path';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MatchGateway, MatchService, AdminGuard],
+  providers: [AppService, AdminGuard],
 })
 export class AppModule {}

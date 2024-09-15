@@ -5,7 +5,6 @@ import { GameEntity } from 'src/database/tables/GameEntity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/database/tables/User';
-import { MatchService } from 'src/match/match.service';
 import { GameGateway } from './game.gateway';
 
 @Module({
@@ -13,7 +12,7 @@ import { GameGateway } from './game.gateway';
     TypeOrmModule.forFeature([GameEntity, User])
   ],
   controllers: [GameController],
-  providers: [GameService, UsersService, MatchService, GameGateway],
+  providers: [GameService, UsersService, GameGateway],
   exports: [GameService, TypeOrmModule],
 })
 export class GameModule {}

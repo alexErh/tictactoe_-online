@@ -9,10 +9,9 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { ReturnGameDto } from './dto/returnGameDto';
-import { ReturnQueueEntityDto } from 'src/match/dto/returnQueueEntityDto';
-import { MatchService } from 'src/match/match.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from 'src/helpers/guards/auth.guard';
+import { ReturnQueueEntityDto } from './dto/returnQueueEntityDto';
 
 @ApiTags('game')
 @Controller('game')
@@ -20,7 +19,6 @@ export class GameController {
   constructor(
     private readonly usersService: UsersService,
     private readonly gameService: GameService,
-    private readonly matchService: MatchService,
   ) {}
 
   @Get(':nickname')

@@ -26,6 +26,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('Client disconnected: ', client.id);
   }
 
+  @SubscribeMessage('joinQueue')
+  async handleJoinQueue(client: Socket, nickname: string) {
+
+    const gameStatus = await this.gameService.joinPlayersQueue(client.id, nickname);
+
+    if (gameStatus) {
+      if (gameStatus instanceof GameStatusDto) {
+        this.server.to(gameStatus.player1.clientId).emit('newState', gameStatus);
+        client.emit('newState', gameStatus);
+      } else {
+        client.emit('error', { message: gameStatus });
+      }
+    }
+  }
+
+  @SubscribeMessage('cancelQueue')
+  handleCancelQueue(client: Socket) {
+    if (this.gameService.popPlayerFromQueue(client.id))
+      client.emit('queueCancelled', { message: 'Queue cancelled successfully.' });
+  }
+
   @SubscribeMessage('makeMove')
   async handleMove(client: Socket, data: GameStatusDto) {
     const newBoard = new Board(data.board);
