@@ -72,12 +72,12 @@ Das Frontend des Projekts ist modular aufgebaut und enthält verschiedene Seiten
 
 **Dateipfad:** `./frontend/src/app/resultat/`
 
-### Navigationskomponente
+### 9. Navigationskomponente
 Eine **Navigationskomponente** ist in mehreren Seiten eingebettet, wie in der Startseite, Profilseite, Ergebnisseite und Adminseite. Diese Komponente ermöglicht eine einfache Navigation zwischen den verschiedenen Bereichen der Anwendung.
 
 **Dateipfad:** `./frontend/src/app/navigation/`
 
-### Services-Datei
+### 10. Service-Dateien
 Die Service-Datei stellt die Verbindung zwischen dem Frontend und dem Backend her. Sie ermöglichen die Kommunikation mit der Datenbank und enthalten die benötigten Logiken für Authentifizierung, Spielverlauf und weitere Operationen. Zu den wichtigsten Services gehören:
 
 - `admin.service`: Verwalten der Admin-Operationen (Spielüberwachung, Nutzerverwaltung)
@@ -91,7 +91,7 @@ Die Service-Datei stellt die Verbindung zwischen dem Frontend und dem Backend he
 **Dateipfad:** `./frontend/src/app/services/`
 
 
-### Helpers-Datei mit Guards
+### 11. Helpers-Datei mit Guards
 In der **helpers**-Datei werden **Guards** über das Quarts-Framework verwendet, um den Zugriff auf bestimmte Seiten oder Funktionen zu beschränken. Es gibt zwei Haupt-Guards, die verwendet werden:
 
 1. **auth.guard**:
@@ -174,7 +174,7 @@ Das Backend des Projekts ist modular aufgebaut und verwendet verschiedene Servic
 **Dateipfad:**
 - `./src/game/`
 
-## Guards
+## 7. Guards
 Im Backend wurden zwei Guards implementiert, um den Zugriff auf bestimmte Routen zu sichern:
 
 1. **auth.guard**:
@@ -186,7 +186,7 @@ Im Backend wurden zwei Guards implementiert, um den Zugriff auf bestimmte Routen
 **Dateipfad:**
 - `./src/helpers/guards/`
 
-## Datenbank
+## 8. Datenbank
 Die Backend-Komponenten greifen auf die Datenbank zu, um die benötigten Informationen zu speichern und abzurufen. Zwei zentrale Tabellen werden verwendet:
 
 1. **Game-Entity**: Verwaltung der Spieldaten.
@@ -195,7 +195,7 @@ Die Backend-Komponenten greifen auf die Datenbank zu, um die benötigten Informa
 **Dateipfad:**
 - `./src/database/tables/`
 
-## Module, Services und Controller
+## 9. Module, Services und Controller
 
 Das Backend verwendet die **Modularisierung**, um verschiedene Aspekte der Anwendung zu trennen. Jedes Modul besteht aus zugehörigen Services, Controllern und DTOs.
 
