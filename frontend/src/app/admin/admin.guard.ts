@@ -14,12 +14,10 @@ export class AdminGuard implements CanActivate {
   canActivate(): boolean {
     if (this.authService.isAdmin())
       return true;
-    
-    this.router.navigate(['/start'], {
-      state: { message: 'Sie haben keine Admin-Berechtigungen.'}
-    });
+
+    alert('Sie haben keine Admin-Berechtigungen');
     return false;
-    
+
   }
 }
 
