@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {SquareComponent} from "../square/square.component";
-import {GameDataService} from "../services/game-data.service";
+import { GameDataService, GameStatusDto } from '../services/game-data.service';
 
 @Component({
   selector: 'app-spielseite',
@@ -13,39 +13,46 @@ import {GameDataService} from "../services/game-data.service";
 })
 export class SpielseiteComponent implements OnInit{
   public gameService: GameDataService = inject(GameDataService);
-  squares: Square[] | undefined;
+  squares: Square[] = [];
   xIsNext: boolean | undefined;
-  winner: string | undefined;
+  winner: string | null | undefined;
   constructor() {}
 
   ngOnInit() {
     this.newGame();
+    this.listenToGameUpdates();
   }
   newGame() {
-    this.gameService.createGame('malek', 'moutaz').subscribe((game) => {
-      console.log('Neues Spiel erstellt: ', game);
-    });
-    this.squares = [
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-      new Square(null),
-    ];
+    this.squares = Array(9).fill(null).map(() => new Square(null));
     this.winner = undefined;
-    this.xIsNext = true;
+  }
 
-  }
-  get player() {
-    return this.xIsNext ? 'X' : 'O';
-  }
   makeMove(idx: number) {
-    console.log("idx: "+idx);
+    console.log("makeMove", idx)
+    const currentSymbol = this.gameService.makeMove(idx);
+    console.log("current", currentSymbol);
+    if (currentSymbol === 'X' || currentSymbol === 'O') {
+      this.squares[idx] = new Square(currentSymbol);
+    }
+    else {
+      console.error('Ungültiger Zug: currentSymbol ist null oder undefined');
+    }
   }
+
+  listenToGameUpdates() {
+    this.gameService.listen('newState').subscribe((newGameState) => {
+      console.log('Received new game state from server:', newGameState);
+      this.squares = newGameState.board.map(value => new Square(value));
+      //this.winner = newGameState.winner;
+    });
+
+    this.gameService.listen('setWinner').subscribe((finalState) => {
+      console.log('Received final game state (winner) from server:', finalState);
+      this.squares = finalState.board.map(value => new Square(value));
+      this.winner = finalState.winner;
+    });
+  }
+
 }
 
 class Square {

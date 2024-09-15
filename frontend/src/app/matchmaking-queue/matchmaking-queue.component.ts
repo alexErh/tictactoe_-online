@@ -12,7 +12,7 @@ import { Player } from '../models/player.model';
   templateUrl: './matchmaking-queue.component.html',
   styleUrls: ['./matchmaking-queue.component.css'],
 })
-export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
+export class MatchmakingQueueComponent implements OnInit  {
   matchFound: Player | null = null;
   waiting: boolean = false;
 
@@ -38,9 +38,7 @@ export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
 
   }
 
-  ngOnDestroy() {
-    this.disconnect();
-  }
+
 
   joinQueue() {
     this.matchmakingQueueService.getPlayerName().subscribe({
@@ -75,9 +73,7 @@ export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
   }
 
 
-  disconnect() {
-    this.matchmakingQueueService.disconnect();
-  }
+
 
   startGame() {
     if (this.matchFound) {

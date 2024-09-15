@@ -83,10 +83,10 @@ export class GameService {
   }
 
   async setWinner(data: UpdateGameWinnerDto): Promise<ReturnGameDto> {
-    const game = await this.gameRepository.findOne({ where: { id: data.id } });
-    if (game.winner.trim().length <= 0)
+    const game = await this.gameRepository.findOne({ where: { id: data.id }, relations: ['player1', 'player2'] });
+    if (game.winner && game.winner.trim().length > 0)
       throw new ConflictException(`Winner already exist.`);
-
+    console.log("game",game);
     const player1: User = game.player1;
     const player2: User = game.player2;
     const k = 20;
@@ -232,6 +232,7 @@ export class GameService {
 
   getWinner(board: Board): string {
     const winner = board.threeInARow();
+    console.log("getWinner", winner);
     if (board.isDraw()) {
       return 'Draw';
     } else {

@@ -20,7 +20,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gameService: GameService) {
   }
   handleConnection(client: Socket) {
-    console.log('Client connected: ', client.id);
+    console.log('Client connected: game.gateway ', client.id);
   }
   handleDisconnect(client: Socket) {
     console.log('Client disconnected: ', client.id);
@@ -49,6 +49,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('makeMove')
   async handleMove(client: Socket, data: GameStatusDto) {
+    console.log("handleMove, ", data);
     const newBoard = new Board(data.board);
     const winner = this.gameService.getWinner(newBoard);
     if(winner === null) {

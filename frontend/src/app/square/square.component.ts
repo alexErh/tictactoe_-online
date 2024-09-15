@@ -24,7 +24,7 @@ import {NgStyle} from "@angular/common";
   `]
 })
 export class SquareComponent {
-  @Input() squareValue: 'X' | 'O' | null = 'X';
+  @Input() squareValue: 'X' | 'O' | null = null;
 
   getColor(): string {
     if (this.squareValue === 'X') {

@@ -8,7 +8,7 @@ import { games } from './database/demo_data/game';
 import { readFileSync } from 'fs';
 
 @Injectable()
-export class AppService implements OnModuleInit {
+export class AppService {
     constructor(
         @InjectRepository(GameEntity)
         private readonly gameRepository: Repository<GameEntity>,
@@ -18,7 +18,7 @@ export class AppService implements OnModuleInit {
         
     }
     
-    async onModuleInit() {
+    /*async onModuleInit() {
         await Promise.all(
             users.map(async user => {
                 user.img = readFileSync('src/assets/portrait.jpg');
@@ -32,5 +32,5 @@ export class AppService implements OnModuleInit {
                 await this.gameRepository.save(game);
             })
         )
-    }
+    }*/
 }

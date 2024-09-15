@@ -3,6 +3,8 @@ import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { HttpClient } from '@angular/common/http';
 import { Player } from '../models/player.model';
+import { GameDataService } from './game-data.service';
+import { WebsocketService } from './websocket.service';
 
 
 
@@ -11,9 +13,9 @@ import { Player } from '../models/player.model';
 })
 export class MatchmakingQueueService {
   private apiUrl = 'http://localhost:3000/auth';
-  private socket!: Socket;
-  private matchFound$ = new BehaviorSubject<any | null>(null);
-  constructor(private http: HttpClient) {
+  private matchFound$ = new BehaviorSubject<Player | null>(null);
+  private gameObject: any;
+  constructor(private http: HttpClient, private gameDataService: GameDataService, private webSocketService: WebsocketService) {
     this.getPlayerName();
     this.connect();
   }
@@ -32,23 +34,22 @@ export class MatchmakingQueueService {
   }
 
   connect() {
-    this.socket = io('http://localhost:3000/matchmaking', {
-      transports: ['websocket']
-    });  }
+    this.webSocketService.connect('game');
+  }
 
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
+    if (this.webSocketService.getSocket()) {
+      this.webSocketService.disconnect();
     }
   }
 
   joinQueue(nickname: string) {
-    this.socket.emit('joinQueue', nickname);
+    this.webSocketService.getSocket().emit('joinQueue', nickname);
   }
 
   cancelQueue() {
-    this.socket.emit('cancelQueue');
+    this.webSocketService.getSocket().emit('cancelQueue');
     this.matchFound$.next(null);
     this.disconnect()
   }
@@ -57,8 +58,12 @@ export class MatchmakingQueueService {
   onMatchFound(): Observable<Player | null> {
     return this.listen('newState').pipe(
       map((data) => {
-        const clientId = this.socket.id;
+        const clientId = this.webSocketService.getSocket().id;
         let opponent: Player | null = null;
+
+        //save the gameObject to pass it to game-data.service
+        this.gameObject = data;
+        this.gameDataService.saveGameObject(this.gameObject);
 
         if (data.player1.clientId === clientId) {
           opponent = {
@@ -89,11 +94,11 @@ export class MatchmakingQueueService {
   // Die Rückgabefunktion sorgt dafür, dass der Listener entfernt wird, wenn das Observable unsubscribed wird.
   listen(event: string): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on(event, (data) => {
+      this.webSocketService.getSocket().on(event, (data) => {
         console.log(`Event '${event}' received with data:`, data);
         observer.next(data);
       });
-      return () => this.socket.off(event);
+      return () => this.webSocketService.getSocket().off(event);
     });
   }
 }
