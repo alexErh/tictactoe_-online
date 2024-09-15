@@ -49,7 +49,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       update.id = data.id;
       update.winner = data.winner;
 
-      this.gameService.setWinner(update)
+      await this.gameService.setWinner(update)
       this.server.to(data.player1.clientId).emit('setWinner', data);
       this.server.to(data.player2.clientId).emit('setWinner', data);
     }

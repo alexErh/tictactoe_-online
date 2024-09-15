@@ -59,7 +59,6 @@ export class MatchService {
       gameStatus.player2 = player_2;
 
       gameStatus.id = (await this.gameService.createGame(data)).id;
-
       return gameStatus;
     } else {
       const e: QueueEntityDto = new QueueEntityDto();

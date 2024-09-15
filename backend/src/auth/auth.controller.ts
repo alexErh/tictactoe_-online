@@ -51,4 +51,13 @@ export class AuthController {
     return this.authService.getMe(session);
   }
 
+
+  @Get('me')
+  getMyNickname(@Session() session: SessionData) {
+    if(session.isLoggedIn && session.user) {
+      return { nickname: session.user.nickname };
+    }
+    throw new UnauthorizedException('Not authorized');
+  }
+
 }

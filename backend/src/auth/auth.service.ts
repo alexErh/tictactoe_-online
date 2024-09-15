@@ -24,6 +24,7 @@ export class AuthService {
 
   signOut(session: SessionData): void {
     session.isLoggedIn = undefined;
+    session.user = undefined;
   }
 
   async getMe(session: SessionData): Promise<ReturnUserDto> {

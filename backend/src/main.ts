@@ -5,8 +5,8 @@ import 'reflect-metadata';
 import * as session from 'express-session';
 //import * as passport from 'passport';
 import * as crypto from 'crypto';
-//import { IoAdapter } from '@nestjs/platform-socket.io';
-//import { ReturnUserDto } from './users/dto/returnUserDto';
+import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ReturnUserDto } from './users/dto/returnUserDto';
 
 declare module 'express-session' {
   interface SessionData {

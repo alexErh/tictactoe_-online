@@ -24,11 +24,13 @@ export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
+    console.log('Client disconnected: ', client.id);
     this.matchService.leaveQueue(client.id);
   }
 
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(client: Socket, nickname: string) {
+    console.log("nickname", nickname);
     const gameStatus = await this.matchService.joinPlayersQueue(client.id, nickname);
     console.log("status", gameStatus)
     if (gameStatus) {
@@ -39,6 +41,7 @@ export class MatchGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.emit('error', { message: gameStatus });
       }
     }
+    console.log("waiting", this.matchService.getWaitingQueue());
   }
   
   @SubscribeMessage('cancelQueue')
