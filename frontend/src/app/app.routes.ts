@@ -7,7 +7,7 @@ import { SpielseiteComponent } from './spielseite/spielseite.component';
 import { ProfilseiteComponent } from './profilseite/profilseite.component';
 import { StartseiteComponent } from './startseite/startseite.component';
 import { AdminComponent } from './admin/admin.component';
-import { AdminGuard } from './admin/admin.guard';
+import { AdminGuard } from './helpers/guards/admin.guard';
 import { ResultsComponent } from './results/results.component';
 import { AuthGuard } from './helpers/guards/auth.guard';
 

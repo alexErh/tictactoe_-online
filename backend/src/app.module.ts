@@ -7,7 +7,7 @@ import { MatchGateway } from './match/match.gateway';
 import { MatchService } from './match/match.service';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './database/tables/GameEntity';
-import { AdminGuard } from './admin/admin.guard';
+import { AdminGuard } from './helpers/guards/admin.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';

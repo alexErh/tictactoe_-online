@@ -12,7 +12,7 @@ import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnQueueEntityDto } from 'src/match/dto/returnQueueEntityDto';
 import { MatchService } from 'src/match/match.service';
 import { UsersService } from 'src/users/users.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/helpers/guards/auth.guard';
 
 @ApiTags('game')
 @Controller('game')
