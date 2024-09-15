@@ -129,17 +129,14 @@ export class GameService {
     }
   }
 
-  async getGameHistory(nickname: string) {
+  async getGameHistory(nickname: string): Promise<GameEntity[]> {
     try {
       const user = await this.userRepository.findOne({
         where: { nickname: nickname },
       });
 
       if (!user) {
-        throw new HttpException(
-          'Benutzer nicht gefunden',
-          HttpStatus.NOT_FOUND,
-        );
+        return [];
       }
 
       const history = await this.gameRepository.find({
@@ -154,7 +151,6 @@ export class GameService {
       );
     }
   }
-
   async getGameStatistics(nickname: string): Promise<GameStatisticsDto> {
     try {
       const user = await this.userRepository.findOne({
@@ -162,10 +158,7 @@ export class GameService {
       });
 
       if (!user) {
-        throw new HttpException(
-          'Benutzer nicht gefunden',
-          HttpStatus.NOT_FOUND,
-        );
+        return { wins: 0, losses: 0 };
       }
 
       const games = await this.gameRepository.find({
@@ -177,7 +170,7 @@ export class GameService {
         (game) => game.winner && game.winner !== user.nickname,
       ).length;
 
-      return { wins, losses }; // Return the statistics directly
+      return { wins, losses };
     } catch (error) {
       throw new HttpException(
         'Fehler beim Abrufen der Spielstatistik',
