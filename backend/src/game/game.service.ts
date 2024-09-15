@@ -14,35 +14,41 @@ import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 import { Board } from './Board';
+import { QueueEntityDto } from 'src/match/dto/queueEntityDto';
+import { ReturnQueueEntityDto } from 'src/match/dto/returnQueueEntityDto';
+
 
 @Injectable()
 export class GameService {
-  constructor(
-    @InjectRepository(GameEntity)
-    private readonly gameRepository: Repository<GameEntity>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
 
-  async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
-    const user: User = await this.userRepository.findOne({
-      where: { nickname: nickname },
-    });
-    if (!user)
-      throw new NotFoundException(
-        `There is no user with nickname ${nickname}.`,
-      );
+    private waitingQueue: QueueEntityDto[] = [];
 
-    return (
-      await this.gameRepository.find({
-        where: [{ player1: user }, { player2: user }],
-        relations: ['player1', 'player2'],
-      })
-    ).map((e) => {
-      return this.returnGame(e);
-    });
-  }
+    constructor(
+      @InjectRepository(GameEntity)
+      private readonly gameRepository: Repository<GameEntity>,
+      @InjectRepository(User)
+      private readonly userRepository: Repository<User>,
+    ) {}
 
+    async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
+      const user: User = await this.userRepository.findOne({
+        where: { nickname: nickname },
+      });
+      if (!user)
+        throw new NotFoundException(
+          `There is no user with nickname ${nickname}.`,
+        );
+    
+      return (
+        await this.gameRepository.find({
+          where: [{ player1: user }, { player2: user }],
+          relations: ['player1', 'player2'],
+        })
+      ).map((e) => {
+        return this.returnGame(e);
+      });
+    }
+  
   async getAllActiveGames(): Promise<ReturnGameDto[]> {
     const games = await this.gameRepository.find({
       where: {
@@ -56,6 +62,29 @@ export class GameService {
     return games.map((game) => {
       return this.returnGame(game);
     });
+  }
+
+  getWaitingPlayers(): ReturnQueueEntityDto[] {
+    return this.waitingQueue.map(e => {
+        return {
+            userNickname: e.userNickname,
+            userScore: e.userScore
+        }
+    })
+  }
+
+  getWaitingQueue(): QueueEntityDto[] {
+    return this.waitingQueue;
+  }
+
+  pushPlayerToQueue(data: QueueEntityDto) {
+    this.waitingQueue.push(data);
+  }
+
+  popPlayerFromQueue(cliendId: string): boolean {
+    const oldLength = this.waitingQueue.length;
+    this.waitingQueue = this.waitingQueue.filter(e => e.clientId !== cliendId);
+    return this.waitingQueue.length < oldLength ? true : false;
   }
 
   async createGame(data: CreateGameDto): Promise<ReturnGameDto> {

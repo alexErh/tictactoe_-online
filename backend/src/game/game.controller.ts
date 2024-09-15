@@ -45,12 +45,12 @@ export class GameController {
 
   @Get('/waiting/:nickname')
   @UseGuards(AuthGuard)
-  @ApiResponse({ type: [ReturnGameDto] })
+  @ApiResponse({ type: [ReturnQueueEntityDto] })
   async getWaitingQueue(
     @Param('nickname') nickname: string,
   ): Promise<ReturnQueueEntityDto[]> {
     if (await this.usersService.isAdmin(nickname))
-      return this.matchService.getWaitingQueue();
+      return this.gameService.getWaitingPlayers();
     else throw new UnauthorizedException('You are not admin');
   }
 

@@ -9,7 +9,6 @@ import { CreateGameDto } from 'src/game/dto/createGameDto';
 
 @Injectable()
 export class MatchService {
-  private waitingQueue: QueueEntityDto[] = [];
 
   constructor(
     private readonly userService: UsersService,
@@ -23,7 +22,9 @@ export class MatchService {
     const player2 = await this.userService.getOne(nickname);
     if (!player2) return `User ${nickname} not found.`;
 
-    const suitablePlayer = this.waitingQueue.find(
+    const queue = this.gameService.getWaitingQueue();
+
+    const suitablePlayer = queue.find(
       (e) =>
         Math.abs(e.userScore - player2.score) < 200 &&
         e.userNickname !== player2.nickname,
@@ -32,8 +33,7 @@ export class MatchService {
     const gameStatus = new GameStatusDto();
 
     if (suitablePlayer) {
-      gameStatus.nextPlayer =
-        Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
+      gameStatus.nextPlayer = Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
 
       this.leaveQueue(suitablePlayer.clientId);
 
@@ -65,25 +65,14 @@ export class MatchService {
       e.clientId = clientId;
       e.userNickname = player2.nickname;
       e.userScore = player2.score;
-      this.waitingQueue.push(e);
+      if(!queue.some(item => item.userNickname === e.userNickname)) {
+        this.gameService.pushPlayerToQueue(e)
+      }
       return null;
     }
   }
 
-  getWaitingQueue(): ReturnQueueEntityDto[] {
-    return this.waitingQueue.map((e) => {
-      return {
-        userNickname: e.userNickname,
-        userScore: e.userScore,
-      };
-    });
-  }
-
   leaveQueue(cliendId: string): boolean {
-    const initLength: number = this.waitingQueue.length;
-    this.waitingQueue = this.waitingQueue.filter(
-      (e) => e.clientId !== cliendId,
-    );
-    return initLength < this.waitingQueue.length ? true : false;
+    return this.gameService.popPlayerFromQueue(cliendId);
   }
 }
