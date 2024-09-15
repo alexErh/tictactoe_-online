@@ -1,8 +1,8 @@
 import { IsNumber, IsString } from 'class-validator';
-import { Socket } from 'socket.io';
 
 export class PlayerDto {
-  client: Socket;
+  @IsString()
+  clientId: string;
 
   @IsString()
   nickname: string;
@@ -11,6 +11,4 @@ export class PlayerDto {
   score: number;
 
   symbol: 'X' | 'O';
-
-  img: Buffer;
 }

@@ -7,7 +7,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-
   nickname: string;
 
 

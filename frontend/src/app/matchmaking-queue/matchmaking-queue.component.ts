@@ -25,6 +25,7 @@ export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
     this.joinQueue();
 
     this.matchmakingQueueService.onMatchFound().subscribe((opponent) => {
+      console.log("opponent", opponent);
       if (opponent) {
         this.matchFound = opponent;
         this.waiting = false;
@@ -42,9 +43,19 @@ export class MatchmakingQueueComponent implements OnInit, OnDestroy  {
   }
 
   joinQueue() {
-    const playerData = { nickname: 'Player1', elo: 1200 };
-    this.waiting = true;
-    this.matchmakingQueueService.joinQueue(playerData);
+    this.matchmakingQueueService.getPlayerName().subscribe({
+      next: (playerData) => {
+        this.waiting = true;
+        if (playerData) {
+          this.matchmakingQueueService.joinQueue(playerData);
+        } else {
+          console.error('No player name available');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching player name', error);
+      }
+    });
   }
 
   confirmCancelQueue() {

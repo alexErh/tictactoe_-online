@@ -9,15 +9,15 @@
         <!-- Bild und Name -->
         <div class="row profile-details mb-4 align-items-center justify-content-start mt-5">
           <div class="col-md-4 d-flex justify-content-center">
-            <div class="profile-picture">
-              <img ngSrc="{{ profileImage || defaultProfileImage }}" alt="Profilbild" class="img-fluid rounded-circle" width="200" height="200"/>
+            <div class="profile-picture d-flex justify-content-center align-items-center">
+              <img [src]="'data:image/png;base64,'+user?.img" alt="Profilbild" class="img-fluid rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
             </div>
 
           </div>
           <div class="col-md-8">
             <div class="profile-info text-start">
-              <p>Name: {{ playerStats?.nickname }}</p>
-              <p>Scores: {{ playerStats?.score }}</p>
+              <h3>Name: {{ user?.nickname }}</h3>
+              <h5>Scores: {{ user?.score }}</h5>
             </div>
           </div>
         </div>
@@ -71,17 +71,27 @@
             </h2>
             <div id="flush-collapseSettings" class="accordion-collapse collapse" [ngClass]="{'show': isSettingsLoaded}" aria-labelledby="flush-headingSettings" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
+
+                <h5 class="mt-4">Passwort aktualisieren</h5>
                 <form [formGroup]="profileForm" (ngSubmit)="onPasswordChange()">
+                  <div class="col-auto mb-3">
+                    <input id="oldPassword" formControlName="oldPassword" type="password" class="form-control" placeholder="Alter Passwort"/>
+                  </div>
+                  <div class="col-auto mb-3">
+                    <input id="newPassword" formControlName="newPassword" type="password" class="form-control" placeholder="Neuer Passwort"/>
+                  </div>
                   <div class="mb-3">
-                    <label for="password" class="form-label">Neues Passwort:</label>
-                    <input id="password" formControlName="password" type="password" class="form-control" />
+                    <input id="confirmation" formControlName="confirmation" type="password" class="form-control" placeholder="Passwort bestätigen"/>
                   </div>
                   <button type="submit" class="btn btn-danger" [disabled]="profileForm.invalid">Passwort ändern</button>
                 </form>
 
 
-                <h3 class="mt-4">Profilbild aktualisieren</h3>
+                <h5 class="mt-4">Profilbild aktualisieren</h5>
+                <div class="mb-3">
                 <input type="file" (change)="onFileChange($event)" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-danger" [disabled]="selectedFile === undefined" (click)="onFileUpload()">Profilbild ändern</button>
 
               </div>
             </div>

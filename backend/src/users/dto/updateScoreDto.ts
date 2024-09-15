@@ -7,24 +7,19 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateUserDto {
+export class UpdateScoreDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
   nickname: string;
 
   @IsOptional()
-  @IsString()
-  @ApiProperty()
-  password?: string;
-
-  @IsOptional()
   @IsNumber()
   @ApiProperty()
   score?: number;
 
-  @IsOptional()
+  /* @IsOptional()
   @IsBoolean()
   @ApiProperty()
-  isAdmin?: boolean;
+  isAdmin?: boolean; */
 }

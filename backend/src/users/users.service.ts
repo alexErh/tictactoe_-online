@@ -1,13 +1,20 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from 'src/database/tables/User';
 import { CreateUserDto } from './dto/createUserDto';
-import { UpdateUserDto } from './dto/updateUserDto';
+import { UpdateScoreDto } from './dto/updateScoreDto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+import { ReturnUserDto } from './dto/returnUserDto';
+import { AuthDataDto } from './dto/authDataDto';
+import { UpdatePasswordDto } from './dto/updatePasswordDto';
+import { Buffer } from 'buffer';
 
 @Injectable()
 export class UsersService {
@@ -18,44 +25,74 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async getAuthData(nickname: string): Promise<AuthDataDto> {
+    const user = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+    if (!user) throw new NotFoundException();
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      password: user.password,
+      isAdmin: user.isAdmin,
+    };
   }
 
-  async getOne(nickname: string): Promise<User> {
+  async getAll(): Promise<ReturnUserDto[]> {
+    return (await this.userRepository.find()).map((e) => {
+      return this.returnUser(e);
+    });
+  }
+
+  async getOne(nickname: string): Promise<ReturnUserDto> {
     const user: User = await this.userRepository.findOne({
       where: { nickname: nickname },
     });
-    if (user) return user;
-    throw new NotFoundException();
+    if (!user) throw new NotFoundException();
+    else return this.returnUser(user);
+  }
+
+  async getPlayerStats(nickname: string): Promise<ReturnUserDto> {
+    const user = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with nickname ${nickname} not found`);
+    }
+
+    return this.returnUser(user);
+  }
+
+  async getImg(nickname: string): Promise<string> {
+    return (
+      await this.userRepository.findOne({ where: { nickname: nickname } })
+    ).img.toString('base64');
   }
 
   async create(
     createUserDto: CreateUserDto,
-    file?: Express.Multer.File,
-  ): Promise<User> {
+    img?: Express.Multer.File,
+  ): Promise<ReturnUserDto> {
     const newUser: User = new User();
 
     newUser.nickname = createUserDto.nickname;
     newUser.password = createUserDto.password;
-    if (file) newUser.img = file.buffer;
+    newUser.img = img ? img.buffer : readFileSync(this.avatar_placeholder_path); //saving avatar placeholder if image was't uploaded
 
     const existingUser: User = await this.userRepository.findOne({
       where: { nickname: newUser.nickname },
     });
 
     if (existingUser)
-      throw new ConflictException('User with this nickname already exists');
+      throw new ConflictException(
+        `User with nickname ${existingUser.nickname} already exists`,
+      );
 
     const createdUser: User = await this.userRepository.save(newUser);
-
-    return createdUser;
+    return this.returnUser(createdUser);
   }
 
-  async update(
-    updateUserDto: UpdateUserDto,
-    file?: Express.Multer.File,
-  ): Promise<User> {
+  async updateScore(updateUserDto: UpdateScoreDto): Promise<ReturnUserDto> {
     const userToUpdate: User = await this.userRepository.findOne({
       where: { nickname: updateUserDto.nickname },
     });
@@ -66,12 +103,64 @@ export class UsersService {
       );
     }
 
-    if (file) {
-      userToUpdate.img = file.buffer;
-    }
-    userToUpdate.password = updateUserDto.password;
     userToUpdate.score = updateUserDto.score;
-    userToUpdate.isAdmin = updateUserDto.isAdmin;
-    return await this.userRepository.save(userToUpdate);
+
+    const updatedUser = await this.userRepository.save(userToUpdate);
+    return this.returnUser(updatedUser);
+  }
+
+  async updatePW(data: UpdatePasswordDto): Promise<ReturnUserDto> {
+    const user: User = await this.userRepository.findOne({
+      where: { nickname: data.nickname },
+    });
+    console.log(user);
+    if (!user)
+      throw new NotFoundException(
+        `User with nickname ${data.nickname} not found`,
+      );
+    else if (user.password !== data.oldPW)
+      throw new ConflictException('The old password is false.');
+    else {
+      user.password = data.newPW;
+      return this.returnUser(await this.userRepository.save(user));
+    }
+  }
+
+  async updateImg(
+    nickname: string,
+    img: Express.Multer.File,
+  ): Promise<ReturnUserDto> {
+    const userToUpdate: User = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+
+    userToUpdate.img = img.buffer;
+
+    return this.returnUser(await this.userRepository.save(userToUpdate));
+  }
+
+  async updateToAdmin(nickname: string): Promise<ReturnUserDto> {
+    const userToUpdate: User = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+    userToUpdate.isAdmin = true;
+    return this.returnUser(await this.userRepository.save(userToUpdate));
+  }
+
+  async isAdmin(nickname: string): Promise<boolean> {
+    return (
+      await this.userRepository.findOne({ where: { nickname: nickname } })
+    ).isAdmin;
+  }
+
+  private returnUser(user: User): ReturnUserDto {
+    const base64Image = user.img ? user.img.toString('base64') : null;
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      score: user.score,
+      img: base64Image,
+      isAdmin: user.isAdmin,
+    };
   }
 }

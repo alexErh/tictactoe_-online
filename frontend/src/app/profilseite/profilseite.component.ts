@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ProfileService } from '../services/profile.service';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { HttpEventType } from '@angular/common/http';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { catchError, Observable, of, switchMap } from 'rxjs';
+import { UserDto } from '../DTOs/userDto';
+import { AuthService } from '../services/auth.service';
 
 interface PlayerStats {
   nickname: string;
@@ -36,7 +37,6 @@ export class ProfilseiteComponent implements OnInit {
   playerStats: PlayerStats | null = null;
   gameHistory: any[] = [];
   profileForm: FormGroup;
-  uploadProgress: number = 0;
   profileImage: string | null = null;
   defaultProfileImage: string = 'assets/portrait.jpg';
   isStatsLoaded: boolean = false;
@@ -44,16 +44,24 @@ export class ProfilseiteComponent implements OnInit {
   isSettingsLoaded: boolean = false;
   profileImage$: Observable<string>;
   public profileService: ProfileService = inject(ProfileService);
+  public user: UserDto | undefined;
+  public selectedFile: File | undefined;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
     this.profileImage$ = new Observable<string>();
     this.profileForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      oldPassword: ['', [Validators.required,]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmation: ['', [Validators.required, Validators.minLength(6)]],
       file: [null],
     });
   }
 
   ngOnInit() {
+    this.user = this.authService.getUser();
     this.loadProfileImage();
     this.loadPlayerStats();
     this.loadGameHistory();
@@ -61,56 +69,68 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   loadPlayerStats() {
-    this.profileService.getPlayerStats().subscribe({
-      next: (data: PlayerStats) => {
-        this.playerStats = {
-          nickname: data.nickname || '',
-          score: data.score || 0,
-          isAdmin: data.isAdmin || false,
-          img: data.img ? URL.createObjectURL(new Blob([data.img])) : this.defaultProfileImage,
-          wins: data.wins || 0,
-          losses: data.losses || 0,
-        };
-        this.profileImage = this.playerStats.img || this.defaultProfileImage;
-        this.loadGameStatistics();
-      },
-      error: (error) => {
-        console.error('Error loading player stats:', error);
-        alert('Fehler beim Laden der Spielerstatistiken.');
-      }
-    });
+    if (this.user) {
+      this.profileService.getPlayerStats(this.user.nickname).subscribe({
+        next: (data: PlayerStats) => {
+          this.playerStats = {
+            nickname: data.nickname || '',
+            score: data.score || 0,
+            isAdmin: data.isAdmin || false,
+            img: data.img ? URL.createObjectURL(new Blob([data.img])) : this.defaultProfileImage,
+            wins: data.wins || 0,
+            losses: data.losses || 0,
+          };
+          this.profileImage = this.playerStats.img || this.defaultProfileImage;
+          this.loadGameStatistics();
+        },
+        error: (error) => {
+          console.error('Error loading player stats:', error);
+          alert('Fehler beim Laden der Spielerstatistiken.');
+        }
+      });
+    }
   }
 
   loadGameHistory() {
-    this.profileService.getGameHistory().subscribe({
-      next: (data) => {
-        this.gameHistory = data.map((game: any) => ({
-          id: game.id,
-          player1: game.player1,
-          player2: game.player2,
-          currentTurn: game.currentTurn,
-          winner: game.winner,
-        }));
-      },
-      error: (error) => {
-        console.error('Error loading game history:', error);
-        alert('Fehler beim Laden der Spielhistorie.');
-      }
-    });
+    if (this.user) {
+      this.profileService.getGameHistory(this.user.nickname).subscribe({
+        next: (data) => {
+          this.gameHistory = data.map((game: any) => ({
+            id: game.id,
+            player1: game.player1.nickname,
+            player2: game.player2.nickname,
+            winner: game.winner,
+          }));
+          this.isHistoryLoaded = true;
+        },
+        error: (error) => {
+          console.error('Error loading game history:', error);
+          alert('Fehler beim Laden der Spielhistorie.');
+        }
+      });
+    }
   }
 
   loadGameStatistics() {
-    this.profileService.getGameStatistics().subscribe((stats) => {
-      if (this.playerStats) {
-        this.playerStats.wins = stats.wins;
-        this.playerStats.losses = stats.losses;
-      }
-    });
+    if (this.user) {
+      this.profileService.getGameStatistics(this.user.nickname).subscribe({
+        next: (stats) => {
+          if (this.playerStats) {
+            this.playerStats.wins = stats.wins;
+            this.playerStats.losses = stats.losses;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading game statistics:', error);
+          alert('Fehler beim Laden der Spielstatistiken: ' + error.message);
+        }
+      });
+    }
   }
 
   loadProfileImage() {
     if (this.playerStats?.nickname) {
-      this.profileImage$ = this.profileService.getProfileImage().pipe(
+      this.profileImage$ = this.profileService.getProfileImage(this.playerStats.nickname).pipe(
         switchMap((blob) => {
           const reader = new FileReader();
           return new Observable<string>(observer => {
@@ -151,8 +171,12 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   onPasswordChange() {
-    if (this.profileForm.valid) {
-      this.profileService.changePassword(this.profileForm.value.password).subscribe({
+    const oldPassword = this.profileForm.value.oldPassword;
+    const newPassword = this.profileForm.value.newPassword;
+    const confirmation = this.profileForm.value.confirmation;
+
+    if (this.profileForm.valid && newPassword === confirmation && this.user && this.user.nickname) {
+      this.profileService.changePassword(this.user.nickname, oldPassword, newPassword).subscribe({
         next: () => {
           alert('Passwort erfolgreich geändert');
           this.profileForm.reset();
@@ -163,21 +187,20 @@ export class ProfilseiteComponent implements OnInit {
         }
       });
     } else {
-      alert('Das Formular ist ungültig.');
+      alert('Das Formular ist ungültig oder der Benutzer ist nicht angemeldet.');
     }
   }
 
-
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
-      const formData = new FormData();
-      formData.append('file', file);
+    this.selectedFile = event.target.files[0];
+    console.log(this.selectedFile !== undefined)
+  }
 
-      this.profileService.uploadProfileImage(formData).subscribe({
+  onFileUpload() {
+    if (this.selectedFile) {
+      this.profileService.uploadProfileImage(this.selectedFile).subscribe({
         next: () => {
-          alert('Profilbild erfolgreich hochgeladen!');
+          this.user = this.authService.getUser()
         },
         error: (error) => {
           console.error('Error uploading profile image:', error);
