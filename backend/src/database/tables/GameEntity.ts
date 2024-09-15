@@ -3,10 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
-  PrimaryColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
-  Unique,
 } from 'typeorm';
 import { User } from './User';
 
@@ -15,11 +13,11 @@ export class GameEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, {eager: true})
   @JoinColumn()
   player1: User;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, {eager: true})
   @JoinColumn()
   player2: User;
 

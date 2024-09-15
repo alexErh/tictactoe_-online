@@ -1,0 +1,29 @@
+{
+    "users":
+    [
+        {
+          "nickname": "PlayerOne",
+          "password": "password123" 
+        },
+        {
+          "nickname": "PlayerTwo",
+          "password": "password123"
+        },
+        {
+          "nickname": "AdminUser",
+          "password": "adminpassword"
+        },
+        {
+          "nickname": "PlayerThree",
+          "password": "password456"
+        },
+        {
+          "nickname": "PlayerFour",
+          "password": "password789"
+        },
+        {
+          "nickname": "PlayerFive",
+          "password": "password123"
+        }
+    ]
+}
