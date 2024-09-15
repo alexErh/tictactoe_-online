@@ -92,30 +92,41 @@ export class ProfilseiteComponent implements OnInit {
   }
 
   loadGameHistory() {
-    this.profileService.getGameHistory().subscribe({
-      next: (data) => {
-        this.gameHistory = data.map((game: any) => ({
-          id: game.id,
-          player1: game.player1,
-          player2: game.player2,
-          currentTurn: game.currentTurn,
-          winner: game.winner,
-        }));
-      },
-      error: (error) => {
-        console.error('Error loading game history:', error);
-        alert('Fehler beim Laden der Spielhistorie.');
-      }
-    });
+    if (this.user) {
+      this.profileService.getGameHistory(this.user.nickname).subscribe({
+        next: (data) => {
+          this.gameHistory = data.map((game: any) => ({
+            id: game.id,
+            player1: game.player1,
+            player2: game.player2,
+            currentTurn: game.currentTurn,
+            winner: game.winner,
+          }));
+          this.isHistoryLoaded = true;
+        },
+        error: (error) => {
+          console.error('Error loading game history:', error);
+          alert('Fehler beim Laden der Spielhistorie.');
+        }
+      });
+    }
   }
 
   loadGameStatistics() {
-    this.profileService.getGameStatistics().subscribe((stats) => {
-      if (this.playerStats) {
-        this.playerStats.wins = stats.wins;
-        this.playerStats.losses = stats.losses;
-      }
-    });
+    if (this.user) {
+      this.profileService.getGameStatistics(this.user.nickname).subscribe({
+        next: (stats) => {
+          if (this.playerStats) {
+            this.playerStats.wins = stats.wins;
+            this.playerStats.losses = stats.losses;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading game statistics:', error);
+          alert('Fehler beim Laden der Spielstatistiken: ' + error.message);
+        }
+      });
+    }
   }
 
   loadProfileImage() {
@@ -188,9 +199,6 @@ export class ProfilseiteComponent implements OnInit {
 
   onFileUpload() {
     if (this.selectedFile) {
-      // FormData wird verwendet, um die Datei für die HTTP-Anfrage vorzubereiten.
-
-
       this.profileService.uploadProfileImage(this.selectedFile).subscribe({
         next: () => {
           this.user = this.authService.getUser()

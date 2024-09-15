@@ -14,7 +14,6 @@ import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
 import { ReturnGameDto } from './dto/returnGameDto';
 import { ReturnUserDto } from 'src/users/dto/returnUserDto';
 import { Board } from './Board';
-import { GameStatisticsDto } from './dto/GameStatisticsDto';
 
 @Injectable()
 export class GameService {
@@ -130,48 +129,42 @@ export class GameService {
     }
   }
 
-  async getGameHistory(nickname: string): Promise<GameEntity[]> {
+  async getGameStatistics(
+    nickname: string,
+  ): Promise<{ wins: number; losses: number; games: ReturnGameDto[] }> {
     try {
       const user = await this.userRepository.findOne({
         where: { nickname: nickname },
       });
 
       if (!user) {
-        return [];
-      }
-
-      const history = await this.gameRepository.find({
-        where: [{ player1: user }, { player2: user }],
-      });
-
-      return history;
-    } catch (error) {
-      throw new HttpException(
-        'Fehler beim Abrufen der Spielhistorie',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-  async getGameStatistics(nickname: string): Promise<GameStatisticsDto> {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { nickname: nickname },
-      });
-
-      if (!user) {
-        return { wins: 0, losses: 0 };
+        return { wins: 0, losses: 0, games: [] };
       }
 
       const games = await this.gameRepository.find({
         where: [{ player1: user }, { player2: user }],
+        relations: ['player1', 'player2'],
       });
 
       const wins = games.filter((game) => game.winner === user.nickname).length;
       const losses = games.filter(
-        (game) => game.winner && game.winner !== user.nickname,
+        (game) => game.winner !== null && game.winner !== user.nickname,
       ).length;
 
-      return { wins, losses };
+      const gameDtos = games.map((game) => {
+        return {
+          id: game.id,
+          player1: {
+            nickname: game.player1.nickname,
+          },
+          player2: {
+            nickname: game.player2.nickname,
+          },
+          winner: game.winner,
+        } as ReturnGameDto;
+      });
+
+      return { wins, losses, games: gameDtos };
     } catch (error) {
       throw new HttpException(
         'Fehler beim Abrufen der Spielstatistik',

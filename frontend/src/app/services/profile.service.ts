@@ -23,8 +23,8 @@ export class ProfileService {
     );
   }
 
-  getGameHistory(): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:3000/game/history`).pipe(
+  getGameHistory(nickname: string): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:3000/game/${nickname}`).pipe(
       catchError(error => {
         console.error('Error fetching game history:', error);
         return throwError(() => new Error('Error fetching game history'));
@@ -32,14 +32,15 @@ export class ProfileService {
     );
   }
 
-  getGameStatistics(): Observable<{ wins: number; losses: number }> {
-    return this.http.get<{ wins: number; losses: number }>(`http://localhost:3000/game/statistics`).pipe(
+  getGameStatistics(nickname: string): Observable<{ wins: number; losses: number }> {
+    return this.http.get<{ wins: number; losses: number }>(`http://localhost:3000/game/statistics/${nickname}`).pipe(
       catchError(error => {
         console.error('Error fetching game statistics:', error);
-        return throwError(() => new Error('Error fetching game statistics'));
+        return throwError(() => new Error('Error fetching game statistics: ' + (error.message || 'Unknown error')));
       })
     );
   }
+
 
   changePassword(nickname: string, oldPassword: string, newPassword: string): Observable<void> {
     const oldHash = crypto.SHA256(oldPassword).toString(crypto.enc.Hex);
