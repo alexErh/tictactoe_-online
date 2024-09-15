@@ -47,7 +47,7 @@ export class AdminComponent implements OnInit {
 
   toggleGames() {
     this.isGamesVisible = !this.isGamesVisible;
-    this.isPlayersVisible = false; // Schließt andere Abschnitte
+    this.isPlayersVisible = false;
     this.isQueueVisible = false;
   }
 
@@ -74,6 +74,7 @@ export class AdminComponent implements OnInit {
     if (this.adminNickname) {
       this.adminService.getGames(this.adminNickname).subscribe({
         next: (data) => {
+          console.log('Received games data:', data);
           this.games = data;
         },
         error: (err) => {

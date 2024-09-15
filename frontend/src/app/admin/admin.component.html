@@ -62,8 +62,8 @@
                     @for (game of games; track game) {
                       <tr>
                         <td>{{ game.id }}</td>
-                        <td>{{ game.player1 }}</td>
-                        <td>{{ game.player2 }}</td>
+                        <td>{{ game.player1?.nickname || 'Unknown Player' }}</td>
+                        <td>{{ game.player2?.nickname || 'Unknown Player' }}</td>
                       </tr>
                     }
                   </tbody>
