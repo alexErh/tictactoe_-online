@@ -88,6 +88,7 @@ export class AdminComponent implements OnInit {
     if (this.adminNickname) {
       this.adminService.getQueue(this.adminNickname).subscribe({
         next: (data) => {
+          console.log(data)
           this.queue = data;
         },
         error: (err) => {

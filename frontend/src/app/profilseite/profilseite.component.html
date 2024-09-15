@@ -48,15 +48,28 @@
             </h2>
             <div id="flush-collapseHistory" class="accordion-collapse collapse" [ngClass]="{'show': isHistoryLoaded}" aria-labelledby="flush-headingHistory" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body">
-                <ul class="list-group">
-                  @for (game of gameHistory; track game) {
-                    <li class="list-group-item">
-                      <p>Spieler 1: {{ game.player1 }}</p>
-                      <p>Spieler 2: {{ game.player2 }}</p>
-                      <p>Gewinner: {{ game.winner || 'Keiner' }}</p>
-                    </li>
-                  }
-                </ul>
+                <div>
+                  <table class="table table-striped">
+                    <thead class="col">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">1. Spieler</th>
+                        <th scope="col">2. Spieler</th>
+                        <th scope="col">Gewinner</th>
+                      </tr>
+                    </thead>
+                    <tbody class="col">
+                      @for (game of gameHistory; track game.id; let idx = $index) {
+                        <tr>
+                          <th scope="row">{{idx+1}}</th>
+                          <td>{{ game.player1 }}</td>
+                          <td>{{ game.player2 }}</td>
+                          <td>{{ game.winner }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

@@ -11,14 +11,14 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   getUsers(nickname: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.usersApiUrl}/all/${nickname}`);
+    return this.http.get<any[]>(`${this.usersApiUrl}/all/${nickname}`, {withCredentials: true});
   }
 
   getGames(nickname: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.gamesApiUrl}/active/${nickname}`);
+    return this.http.get<any[]>(`${this.gamesApiUrl}/active/${nickname}`, {withCredentials: true});
   }
 
   getQueue(nickname: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.gamesApiUrl}/waiting/${nickname}`);
+    return this.http.get<any[]>(`${this.gamesApiUrl}/waiting/${nickname}`, {withCredentials: true});
   }
 }

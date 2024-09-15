@@ -22,14 +22,16 @@
                 <table class="table mt-3">
                   <thead>
                   <tr>
-                    <th>Nickname</th>
-                    <th>Score</th>
-                    <th>Admin</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Nickname</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Admin</th>
                   </tr>
                   </thead>
                   <tbody>
-                    @for (user of users; track user) {
+                    @for (user of users; track user; let idx = $index) {
                       <tr>
+                        <th scope="row">{{idx+1}}</th>
                         <td>{{ user.nickname }}</td>
                         <td>{{ user.score }}</td>
                         <td>{{ user.isAdmin ? 'Yes' : 'No' }}</td>
@@ -84,13 +86,17 @@
                 <table class="table mt-3">
                   <thead>
                   <tr>
-                    <th>Spieler, die auf einen Gegner warten</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Spieler</th>
+                    <th scope="col">Score</th>
                   </tr>
                   </thead>
                   <tbody>
-                    @for (player of queue; track player) {
+                    @for (player of queue; track player; let idx = $index) {
                       <tr>
-                        <td>{{ player.nickname }}</td>
+                        <th scope="row">{{idx+1}}</th>
+                        <td>{{ player.userNickname }}</td>
+                        <td>{{ player.userScore }}</td>
                       </tr>
                     }
                   </tbody>

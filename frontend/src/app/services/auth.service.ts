@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of, throwError, tap, flatMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserDto } from '../DTOs/userDto';
-import { CookieService } from 'ngx-cookie-service';
 import * as crypto from 'crypto-js';
 
 @Injectable({
@@ -21,9 +20,12 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router,
-    private cookieService: CookieService
-  ) {}
+    private router: Router
+  ) {
+    const data = localStorage.getItem('user');
+    if (data)
+      this.user = JSON.parse(data);
+  }
 
   signIn(nickname: string, password: string): Observable<any> {
     const pw = crypto.SHA256(password).toString(crypto.enc.Hex);
@@ -62,7 +64,7 @@ export class AuthService {
           isAdmin: false
         };
         localStorage.removeItem('adminNickname');
-        this.router.navigate(['/register']);
+        this.router.navigate(['/login']);
       })
     );
   }
@@ -70,8 +72,7 @@ export class AuthService {
   setCurrentUser(user: UserDto): void {
     this.user = user;
 
-
-    localStorage.setItem('adminNickname', user.nickname);
+    localStorage.setItem('user', JSON.stringify(user))
   }
 
   isAdmin(): boolean {

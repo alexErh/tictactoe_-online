@@ -113,7 +113,6 @@ export class UsersService {
     const user: User = await this.userRepository.findOne({
       where: { nickname: data.nickname },
     });
-    console.log(user);
     if (!user)
       throw new NotFoundException(
         `User with nickname ${data.nickname} not found`,

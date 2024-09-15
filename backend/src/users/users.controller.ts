@@ -9,6 +9,7 @@ import {
     Put, Query,
     UnauthorizedException,
     UploadedFile,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import {UsersService} from "./users.service";
@@ -19,6 +20,7 @@ import { ReturnUserDto } from './dto/returnUserDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdatePasswordDto } from './dto/updatePasswordDto';
 import { UpdateToAdminDto } from './dto/updateToAdminDto';
+import { AdminGuard } from 'src/helpers/guards/admin.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -26,9 +28,13 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
     
     @Get("all/:nickname")
+    @UseGuards(AdminGuard)
     @ApiResponse({type: [ReturnUserDto]})
     async getAll(@Param("nickname") nickname: string): Promise<ReturnUserDto[]>{
+        if (await this.usersService.isAdmin(nickname))
             return await this.usersService.getAll();
+        else 
+            throw new UnauthorizedException('You are not admin');
     }
 
     @Get(":nickname")
@@ -66,7 +72,6 @@ export class UsersController {
     @UseInterceptors(FileInterceptor('img'))
     @ApiResponse({type: ReturnUserDto})
     async updateImg(@Param("nickname") nickname: string, @UploadedFile() img: Express.Multer.File): Promise<ReturnUserDto> {
-        console.log(img.buffer)
         return await this.usersService.updateImg(nickname, img);
     }
 
@@ -74,7 +79,6 @@ export class UsersController {
     @Put("updatePW")
     @ApiResponse({type: ReturnUserDto})
     async updatePassword(@Body() data: UpdatePasswordDto): Promise<ReturnUserDto> {
-        console.log(data)
         return await this.usersService.updatePW(data);
     }
 

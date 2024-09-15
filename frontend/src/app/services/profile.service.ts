@@ -15,7 +15,7 @@ export class ProfileService {
   ) { }
 
   getPlayerStats(nickname: string): Observable<any> {
-    return this.http.get<any>(`http://localhost:3000/users/${nickname}/stats`).pipe(
+    return this.http.get<any>(`http://localhost:3000/users/${nickname}/stats`, {withCredentials: true}).pipe(
       catchError(error => {
         console.error('Error fetching player stats:', error);
         return throwError(() => new Error('Error fetching player stats'));
@@ -24,7 +24,7 @@ export class ProfileService {
   }
 
   getGameHistory(nickname: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:3000/game/${nickname}`).pipe(
+    return this.http.get<any[]>(`http://localhost:3000/game/${nickname}`, {withCredentials: true}).pipe(
       catchError(error => {
         console.error('Error fetching game history:', error);
         return throwError(() => new Error('Error fetching game history'));
@@ -33,7 +33,7 @@ export class ProfileService {
   }
 
   getGameStatistics(nickname: string): Observable<{ wins: number; losses: number }> {
-    return this.http.get<{ wins: number; losses: number }>(`http://localhost:3000/game/statistics/${nickname}`).pipe(
+    return this.http.get<{ wins: number; losses: number }>(`http://localhost:3000/game/statistics/${nickname}`, {withCredentials: true}).pipe(
       catchError(error => {
         console.error('Error fetching game statistics:', error);
         return throwError(() => new Error('Error fetching game statistics: ' + (error.message || 'Unknown error')));
