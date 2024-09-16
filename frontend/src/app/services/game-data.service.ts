@@ -1,9 +1,11 @@
-import {inject, Injectable} from '@angular/core';
+import { inject, Injectable, OnInit } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import { io, Socket } from 'socket.io-client';
 import { Player } from '../models/player.model';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { WebsocketService } from './websocket.service';
+import { considerSettingUpAutocompletion } from '@angular/cli/src/utilities/completion';
+import { MatchmakingQueueService } from './matchmaking-queue.service';
 type CellValue = 'X' | 'O' | null;
 export interface PlayerDto {
   clientId: string | undefined;
@@ -29,13 +31,21 @@ export interface GameStatusDto {
 export class GameDataService {
   private gameObject: any;
   private gameBoard: CellValue[] = Array(9).fill(null);
+  private nextPlayer: string| null = null;
+
   constructor(private webSocketService: WebsocketService) {
 
   }
+  getNextPlayer() {
+    return this.nextPlayer;
+  }
+
+
 
 
   saveGameObject(gameObject: any) {
     this.gameObject = gameObject;
+    this.nextPlayer = gameObject.nextPlayer;
     console.log('Game object saved:', this.gameObject);
   }
 
@@ -45,6 +55,7 @@ export class GameDataService {
     const currentPlayerSymbol = this.gameObject.nextPlayer === this.gameObject.player1.nickname
       ? this.gameObject.player1.symbol
       : this.gameObject.player2.symbol;
+    console.log("next", this.nextPlayer);
 
     // Das Board wird hier aus dem aktuellen Spielstatus aktualisiert
 
@@ -67,6 +78,7 @@ export class GameDataService {
       winner: null,
       board: this.gameBoard
     };
+    this.nextPlayer = gameStatus.nextPlayer;
 
     // Sende den neuen Spielstatus an den Server
     this.webSocketService.getSocket().emit('makeMove', gameStatus);
@@ -79,6 +91,10 @@ export class GameDataService {
       const socket = this.webSocketService.getSocket();
 
       socket.on(event, (data: GameStatusDto) => {
+        if (event === 'newState') {
+          this.gameBoard = data.board;
+          //this.nextPlayer = data.nextPlayer;
+        }
         observer.next(data);
       });
       return () => {

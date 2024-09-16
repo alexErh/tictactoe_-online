@@ -1,16 +1,14 @@
 <body>
   <div  class="game-container">
-    <button (click)="newGame()">Start new Game</button>
-
     <div>
       @if(winner) {
-        <h2>{{winner}} won the game!</h2>
+        <h2> {{ winner === 'Draw' ? 'Draw' : (winner + ' won the game!') }}</h2>
       }
     </div>
 
     <main>
       @for (val of squares; track $index) {
-        <app-square [squareValue] = val.value  (click)="makeMove($index)">
+        <app-square [squareValue] = val.value (click)="makeMove($index)">
         </app-square>
       }
     </main>

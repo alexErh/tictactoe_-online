@@ -8,7 +8,9 @@ import {NgStyle} from "@angular/common";
     NgStyle
   ],
   template: `
-    <button type="button" class="btn btn-light" [ngStyle]="{'color': getColor()}">{{ squareValue }}</button>
+    <button type="button" class="btn btn-light"
+            [ngStyle]="{'color': getColor()}">
+      {{ squareValue }}</button>
   `,
   styles: [`
     button {
