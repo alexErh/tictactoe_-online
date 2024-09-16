@@ -1,7 +1,8 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {SquareComponent} from "../square/square.component";
-import { GameDataService, GameStatusDto } from '../services/game-data.service';
+import { Component, inject, OnInit } from '@angular/core';
+import { SquareComponent } from "../square/square.component";
+import { GameDataService, PlayerDto, GameStatusDto } from '../services/game-data.service';
 import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-spielseite',
@@ -14,10 +15,14 @@ import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
 })
 export class SpielseiteComponent implements OnInit {
   public gameService: GameDataService = inject(GameDataService);
+  public websocketService: WebsocketService = inject(WebsocketService);
+
   squares: Square[] = [];
   winner: string | null | undefined;
   currentPlayer: string | null = null;
   myNickname: string | null = null;
+  currentPlayerData: PlayerDto | null = null;
+  opponentPlayerData: PlayerDto | null = null;
 
   constructor(private matchmakingQueueService: MatchmakingQueueService) {}
 
@@ -32,6 +37,7 @@ export class SpielseiteComponent implements OnInit {
         if (playerData) {
           this.myNickname = playerData;
           console.log('My Nickname:', this.myNickname);
+          this.getPlayerData(); // Spielerinformationen abrufen
         } else {
           console.error('No player name available');
         }
@@ -40,6 +46,27 @@ export class SpielseiteComponent implements OnInit {
         console.error('Error fetching player name', error);
       }
     });
+  }
+
+  getPlayerData() {
+    this.websocketService.listen('playerDataResponse').subscribe({
+      next: (data) => {
+        if (data) {
+          this.currentPlayerData = data.currentPlayer;
+          this.opponentPlayerData = data.opponentPlayer;
+          console.log('Current Player Data:', this.currentPlayerData);
+          console.log('Opponent Player Data:', this.opponentPlayerData);
+        } else {
+          console.warn('No player data received');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching player data', error);
+      }
+    });
+
+    // Emit event to request player data
+    this.websocketService.getSocket().emit('getPlayerData');
   }
   newGame() {
     this.squares = Array(9).fill(null).map(() => new Square(null));

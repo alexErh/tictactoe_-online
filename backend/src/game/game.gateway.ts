@@ -9,15 +9,19 @@ import { Server, Socket } from 'socket.io';
 import { GameStatusDto } from './dto/gameStatusDto';
 import {Board} from "./Board";
 import {GameService} from "./game.service";
+import {UsersService} from "../users/users.service";
 import {FinalStatusDto} from "./dto/finalStatusDto";
 import { UpdateGameWinnerDto } from './dto/updateGameWinnerDto';
+import { PlayersDataDto } from './dto/PlayersDataDto';
+import { ReturnUserDto } from '../users/dto/returnUserDto';
 
 @WebSocketGateway({namespace: 'game'})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() 
   server: Server;
   
-  constructor(private readonly gameService: GameService) {
+  constructor(private readonly gameService: GameService,
+              private readonly usersService: UsersService) {
   }
   handleConnection(client: Socket) {
     console.log('Client connected: game.gateway ', client.id);
@@ -76,4 +80,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(data.player2.clientId).emit('setWinner', data);
     }
   }
+
+  @SubscribeMessage('getPlayerData')
+  async handleGetPlayerData(client: Socket) {
+    const nickname = await this.getNicknameFromClient(client.id);
+
+    const playerData = await this.gameService.getPlayerData(nickname);
+
+    const response = {
+      currentPlayer: playerData.currentPlayer,
+      opponentNickname: playerData.opponentNickname,
+    };
+
+    client.emit('playerDataResponse', response);
+  }
+
+  private async getNicknameFromClient(clientId: string): Promise<string> {
+    const games = await this.gameService.getAllUserGames('someNickname');
+    return games[0]?.player1.nickname || games[0]?.player2.nickname || '';
+  }
+
 }

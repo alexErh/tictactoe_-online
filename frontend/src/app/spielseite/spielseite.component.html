@@ -1,15 +1,24 @@
 <body>
-  <div  class="game-container">
+<div class="game-page">
+  <div class="player-info">
+    <img src="{{ currentPlayerData?.img }}" alt="{{ currentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" />
+    <p>{{ currentPlayerData?.nickname }} Score: <span id="player-elo">{{ currentPlayerData?.score }}</span></p>
+  </div>
+  <div class="opponent-info">
+    <img src="{{ opponentPlayerData?.img }}" alt="{{ opponentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" />
+    <p>{{ opponentPlayerData?.nickname }} Score: <span id="opponent-elo">{{ opponentPlayerData?.score }}</span></p>
+  </div>
+</div>
+<div class="game-container">
     <div>
-      @if(winner) {
-        <h2> {{ winner === 'Draw' ? 'Draw' : (winner + ' won the game!') }}</h2>
+      @if (winner) {
+      <h2 id="game-result-message">{{ winner === 'Draw' ? 'Draw' : (winner + ' won the game!') }}</h2>
       }
     </div>
-
-    <main>
+    <main id="main-game-content">
       @for (val of squares; track $index) {
-        <app-square [squareValue] = val.value (click)="makeMove($index)">
-        </app-square>
+      <app-square [squareValue]="val.value" (click)="makeMove($index)">
+      </app-square>
       }
     </main>
   </div>

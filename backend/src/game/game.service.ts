@@ -240,6 +240,43 @@ export class GameService {
     }
   }
 
+  async getPlayerData(nickname: string): Promise<{ currentPlayer: ReturnUserDto; opponentNickname: string }> {
+    const currentPlayer = await this.userRepository.findOne({ where: { nickname: nickname } });
+
+    if (!currentPlayer) {
+      throw new NotFoundException(`User with nickname ${nickname} not found`);
+    }
+
+    // Hole das aktuelle Spiel für den Spieler
+    const game = await this.gameRepository.findOne({
+      where: [{ player1: currentPlayer }, { player2: currentPlayer }],
+      relations: ['player1', 'player2'], // Beziehungen, die du benötigst
+    });
+
+    if (!game) {
+      throw new NotFoundException(`No ongoing game found for user ${nickname}`);
+    }
+
+    // Bestimme den Gegner
+    const opponentNickname = game.player1.nickname === nickname ? game.player2.nickname : game.player1.nickname;
+
+    return {
+      currentPlayer: this.returnUser(currentPlayer),
+      opponentNickname: opponentNickname,
+    };
+  }
+
+  private returnUser(user: User): ReturnUserDto {
+    const returnUserDto = new ReturnUserDto();
+    returnUserDto.id = user.id;
+    returnUserDto.nickname = user.nickname;
+    returnUserDto.score = user.score;
+    returnUserDto.img = user.img ? user.img.toString('base64') : null;
+    returnUserDto.isAdmin = user.isAdmin;
+
+    return returnUserDto;
+  }
+
   async getGameStatistics(
     nickname: string,
   ): Promise<{ wins: number; losses: number; games: ReturnGameDto[] }> {

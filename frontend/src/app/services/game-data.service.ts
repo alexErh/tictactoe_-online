@@ -32,6 +32,7 @@ export class GameDataService {
   private gameObject: any;
   private gameBoard: CellValue[] = Array(9).fill(null);
   private nextPlayer: string| null = null;
+  private apiUrl = 'http:/localhost:3000/game'
 
   constructor(private webSocketService: WebsocketService) {
 
@@ -40,7 +41,25 @@ export class GameDataService {
     return this.nextPlayer;
   }
 
+  getPlayerData(): void {
+    this.webSocketService.listen('playerDataResponse').subscribe({
+      next: (data) => {
+        if (data) {
+          this.currentPlayerData = data.currentPlayer;
+          this.opponentPlayerData = data.opponentPlayer;
+          console.log('Current Player Data:', this.currentPlayerData);
+          console.log('Opponent Player Data:', this.opponentPlayerData);
+        } else {
+          console.warn('No player data received');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching player data', error);
+      }
+    });
 
+    this.webSocketService.getSocket().emit('getPlayerData');
+  }
 
 
   saveGameObject(gameObject: any) {
