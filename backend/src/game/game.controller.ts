@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   UnauthorizedException,
   UseGuards,
@@ -38,8 +39,7 @@ export class GameController {
   ): Promise<ReturnGameDto[]> {
     if (await this.usersService.isAdmin(nickname))
       return await this.gameService.getAllActiveGames();
-    else 
-      throw new UnauthorizedException('You are not admin');
+    else throw new UnauthorizedException('You are not admin');
   }
 
   @Get('/waiting/:nickname')
@@ -50,20 +50,29 @@ export class GameController {
   ): Promise<ReturnQueueEntityDto[]> {
     if (await this.usersService.isAdmin(nickname))
       return this.gameService.getWaitingPlayers();
-    else 
-      throw new UnauthorizedException('You are not admin');
+    else throw new UnauthorizedException('You are not admin');
   }
 
   @Get('statistics/:nickname')
   async getGameStatistics(
     @Param('nickname') nickname: string,
   ): Promise<{ wins: number; losses: number; games: ReturnGameDto[] }> {
-    console.log('stats')
+    console.log('stats');
     return await this.gameService.getGameStatistics(nickname);
   }
 
   @Delete('/delete/:id')
   async deleteGame(@Param('id') id: string) {
     await await this.gameService.deleteGame(id);
+  }
+
+  @Get(':id') // Die Route zum Abrufen von Spieldetails
+  @ApiResponse({ type: ReturnGameDto })
+  async getGameDetails(@Param('id') id: string): Promise<ReturnGameDto> {
+    const game = await this.gameService.getGameById(id);
+    if (!game) {
+      throw new NotFoundException(`Game with ID ${id} not found.`);
+    }
+    return game;
   }
 }

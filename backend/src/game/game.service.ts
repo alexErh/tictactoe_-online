@@ -20,39 +20,37 @@ import { GameStatusDto } from './dto/gameStatusDto';
 import { UsersService } from 'src/users/users.service';
 import { PlayerDto } from 'src/users/dto/playerDto';
 
-
 @Injectable()
 export class GameService {
+  private waitingQueue: QueueEntityDto[] = [];
 
-    private waitingQueue: QueueEntityDto[] = [];
+  constructor(
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly usersService: UsersService,
+  ) {}
 
-    constructor(
-      @InjectRepository(GameEntity)
-      private readonly gameRepository: Repository<GameEntity>,
-      @InjectRepository(User)
-      private readonly userRepository: Repository<User>,
-      private readonly usersService: UsersService,
-    ) {}
+  async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
+    const user: User = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
+    if (!user)
+      throw new NotFoundException(
+        `There is no user with nickname ${nickname}.`,
+      );
 
-    async getAllUserGames(nickname: string): Promise<ReturnGameDto[]> {
-      const user: User = await this.userRepository.findOne({
-        where: { nickname: nickname },
-      });
-      if (!user)
-        throw new NotFoundException(
-          `There is no user with nickname ${nickname}.`,
-        );
-    
-      return (
-        await this.gameRepository.find({
-          where: [{ player1: user }, { player2: user }],
-          relations: ['player1', 'player2'],
-        })
-      ).map((e) => {
-        return this.returnGame(e);
-      });
-    }
-  
+    return (
+      await this.gameRepository.find({
+        where: [{ player1: user }, { player2: user }],
+        relations: ['player1', 'player2'],
+      })
+    ).map((e) => {
+      return this.returnGame(e);
+    });
+  }
+
   async getAllActiveGames(): Promise<ReturnGameDto[]> {
     const games = await this.gameRepository.find({
       where: {
@@ -83,10 +81,13 @@ export class GameService {
   }
 
   async setWinner(data: UpdateGameWinnerDto): Promise<ReturnGameDto> {
-    const game = await this.gameRepository.findOne({ where: { id: data.id }, relations: ['player1', 'player2'] });
+    const game = await this.gameRepository.findOne({
+      where: { id: data.id },
+      relations: ['player1', 'player2'],
+    });
     if (game.winner && game.winner.trim().length > 0)
       throw new ConflictException(`Winner already exist.`);
-    console.log("game",game);
+    console.log('game', game);
     const player1: User = game.player1;
     const player2: User = game.player2;
     const k = 20;
@@ -96,18 +97,18 @@ export class GameService {
     let s_player2 = data.winner === player2.nickname ? 1 : 0;
     s_player2 = data.winner === 'Draw' ? 0.5 : s_player2;
     //Berechnung von dem Erwartungswerd der beiden Spieler
-    const e_player1 = 1 / (1 + 10 ** ((player2.score-player1.score) / 400));
-    const e_player2 = 1 / (1 + 10 ** ((player1.score-player2.score) / 400));
+    const e_player1 = 1 / (1 + 10 ** ((player2.score - player1.score) / 400));
+    const e_player2 = 1 / (1 + 10 ** ((player1.score - player2.score) / 400));
     //Die resultierende Elo-Zahl
     const r1_player1 = player1.score + k * (s_player1 - e_player1);
     const r1_player2 = player2.score + k * (s_player2 - e_player2);
-    
+
     player1.score = r1_player1;
     this.userRepository.save(player1);
-    
+
     player2.score = r1_player2;
     this.userRepository.save(player2);
-    
+
     game.winner = data.winner;
     const updatedGame = await this.gameRepository.save(game);
     return this.returnGame(updatedGame);
@@ -152,12 +153,12 @@ export class GameService {
   }
 
   getWaitingPlayers(): ReturnQueueEntityDto[] {
-    return this.waitingQueue.map(e => {
-        return {
-            userNickname: e.userNickname,
-            userScore: e.userScore
-        }
-    })
+    return this.waitingQueue.map((e) => {
+      return {
+        userNickname: e.userNickname,
+        userScore: e.userScore,
+      };
+    });
   }
 
   async joinPlayersQueue(
@@ -166,7 +167,6 @@ export class GameService {
   ): Promise<GameStatusDto | string> {
     const player2 = await this.usersService.getOne(nickname);
     if (!player2) return `User ${nickname} not found.`;
-
 
     const suitablePlayer = this.waitingQueue.find(
       (e) =>
@@ -177,7 +177,8 @@ export class GameService {
     const gameStatus = new GameStatusDto();
 
     if (suitablePlayer) {
-      gameStatus.nextPlayer = Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
+      gameStatus.nextPlayer =
+        Math.random() < 0.5 ? suitablePlayer.userNickname : player2.nickname;
 
       this.popPlayerFromQueue(suitablePlayer.clientId);
 
@@ -209,8 +210,10 @@ export class GameService {
       e.clientId = clientId;
       e.userNickname = player2.nickname;
       e.userScore = player2.score;
-      if(!this.waitingQueue.some(item => item.userNickname === e.userNickname)) {
-        this.pushPlayerToQueue(e)
+      if (
+        !this.waitingQueue.some((item) => item.userNickname === e.userNickname)
+      ) {
+        this.pushPlayerToQueue(e);
       }
       return null;
     }
@@ -226,19 +229,35 @@ export class GameService {
 
   popPlayerFromQueue(cliendId: string): boolean {
     const oldLength = this.waitingQueue.length;
-    this.waitingQueue = this.waitingQueue.filter(e => e.clientId !== cliendId);
+    this.waitingQueue = this.waitingQueue.filter(
+      (e) => e.clientId !== cliendId,
+    );
     return this.waitingQueue.length < oldLength ? true : false;
   }
 
   getWinner(board: Board): string {
     const winner = board.threeInARow();
-    console.log("getWinner", winner);
+    console.log('getWinner', winner);
     if (board.isDraw()) {
       return 'Draw';
     } else {
       return winner;
     }
   }
+
+  async getGameById(id: string): Promise<ReturnGameDto> {
+    const game = await this.gameRepository.findOne({
+      where: { id: id },
+      relations: ['player1', 'player2'],
+    });
+
+    if (!game) {
+      throw new NotFoundException(`Game with ID ${id} not found.`);
+    }
+
+    return this.returnGame(game);
+  }
+
 
   async getGameStatistics(
     nickname: string,

@@ -1,6 +1,7 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {SquareComponent} from "../square/square.component";
-import { GameDataService, GameStatusDto } from '../services/game-data.service';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';  // Importiere Router
+import { SquareComponent } from "../square/square.component";
+import { GameDataService } from '../services/game-data.service';
 import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
 
 @Component({
@@ -19,19 +20,22 @@ export class SpielseiteComponent implements OnInit {
   currentPlayer: string | null = null;
   myNickname: string | null = null;
 
-  constructor(private matchmakingQueueService: MatchmakingQueueService) {}
+  constructor(
+    private matchmakingQueueService: MatchmakingQueueService,
+    private router: Router  // Router injizieren
+  ) {}
 
   ngOnInit() {
     this.getMyNickname();
     this.newGame();
     this.listenToGameUpdates();
   }
+
   getMyNickname() {
     this.matchmakingQueueService.getPlayerName().subscribe({
       next: (playerData) => {
         if (playerData) {
           this.myNickname = playerData;
-          console.log('My Nickname:', this.myNickname);
         } else {
           console.error('No player name available');
         }
@@ -41,6 +45,7 @@ export class SpielseiteComponent implements OnInit {
       }
     });
   }
+
   newGame() {
     this.squares = Array(9).fill(null).map(() => new Square(null));
     this.winner = undefined;
@@ -52,33 +57,34 @@ export class SpielseiteComponent implements OnInit {
       alert('Es ist nicht dein Zug!');
       return;
     }
-    console.log("makeMove", idx)
     const currentSymbol = this.gameService.makeMove(idx);
-    console.log("current", currentSymbol);
     if (currentSymbol === 'X' || currentSymbol === 'O') {
       this.squares[idx] = new Square(currentSymbol);
-    }
-    else {
+    } else {
       console.error('Ungültiger Zug: currentSymbol ist null oder undefined');
     }
   }
 
   listenToGameUpdates() {
+    // Lausche auf den neuen Spielstatus
     this.gameService.listen('newState').subscribe((newGameState) => {
-      console.log('Received new game state from server:', newGameState);
       this.squares = newGameState.board.map(value => new Square(value));
       this.currentPlayer = newGameState.nextPlayer;
-      console.log("current.player", this.currentPlayer);
     });
 
+    // Lausche auf das Spielende (Gewinner oder Unentschieden)
     this.gameService.listen('setWinner').subscribe((finalState) => {
-      console.log('Received final game state (winner) from server:', finalState);
       this.squares = finalState.board.map(value => new Square(value));
       this.winner = finalState.winner;
+
+      // Weiterleitung zur Ergebnisseite, sobald das Spiel beendet ist
+      if (this.winner) {
+        this.router.navigate(['/results'], { state: { winner: this.winner, gameId: this.gameService.getGameId() } });
+      }
+
       this.gameService.disconnect();
     });
   }
-
 }
 
 class Square {
@@ -87,4 +93,3 @@ class Square {
     this.value = value;
   }
 }
-
