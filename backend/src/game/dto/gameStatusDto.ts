@@ -1,14 +1,17 @@
-import { IsArray, IsString } from 'class-validator';
-import { PlayerDto } from 'src/users/dto/playerDto'; 
+import { IsArray, IsString, ValidateNested } from 'class-validator';
+import { PlayerDto } from 'src/users/dto/playerDto';
+import { Type } from 'class-transformer';
 
 export class GameStatusDto {
   @IsString()
   id: string;
 
-  @IsString()
+  @ValidateNested()
+  @Type(() => PlayerDto)
   player1: PlayerDto;
 
-  @IsString()
+  @ValidateNested()
+  @Type(() => PlayerDto)
   player2: PlayerDto;
 
   @IsString()

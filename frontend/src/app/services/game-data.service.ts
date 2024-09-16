@@ -48,33 +48,37 @@ export class GameDataService {
   }
 
   makeMove(idx: number): CellValue | null {
+    if (this.gameObject!.winner) {
+      console.log("Spiel ist bereits beendet. Gewinner: " + this.gameObject!.winner);
+      return null;  // Verhindere weitere Züge, wenn ein Gewinner vorhanden ist
+    }
+
     console.log("idx server: " + idx);
 
-    // Bestimmen, welcher Spieler am Zug ist
     const currentPlayerSymbol = this.gameObject!.nextPlayer === this.gameObject!.player1.nickname
       ? this.gameObject!.player1.symbol
       : this.gameObject!.player2.symbol;
+
     console.log("next", this.nextPlayer);
 
-    // Überprüfen, ob das Feld leer ist
     if (this.gameBoard[idx] === null) {
-      this.gameBoard[idx] = currentPlayerSymbol; // Setze das Feld auf das Symbol des aktuellen Spielers
+      this.gameBoard[idx] = currentPlayerSymbol;
     } else {
       console.error('Das Feld ist bereits belegt');
       return null;
     }
 
-    // Erstelle das neue GameStatusDto mit dem aktualisierten Board
     const gameStatus: GameStatusDto = {
       id: this.gameObject!.id,
       player1: this.gameObject!.player1,
       player2: this.gameObject!.player2,
       nextPlayer: this.gameObject!.nextPlayer === this.gameObject!.player1.nickname
         ? this.gameObject!.player2.nickname
-        : this.gameObject!.player1.nickname, // Den nächsten Spieler setzen
+        : this.gameObject!.player1.nickname,
       winner: null,
       board: this.gameBoard
     };
+
     this.nextPlayer = gameStatus.nextPlayer;
 
     // Sende den neuen Spielstatus an den Server
@@ -88,11 +92,14 @@ export class GameDataService {
       const socket = this.webSocketService.getSocket();
 
       socket.on(event, (data: GameStatusDto) => {
+        console.log('Empfangenes Event:', event, 'Daten:', data);
         if (event === 'newState') {
-          this.gameBoard = data.board;
+          this.gameBoard = data.board; // Aktualisiere das Board
+          this.nextPlayer = data.nextPlayer; // Aktualisiere den nächsten Spieler
         }
         observer.next(data);
       });
+
       return () => {
         socket.off(event);
       };
@@ -103,9 +110,11 @@ export class GameDataService {
     return new Observable<GameStatusDto>(observer => {
       const socket = this.webSocketService.getSocket();
       socket.on('setWinner', (data: GameStatusDto) => {
-        observer.next(data); // Sende die Daten an die Subscriber
-        this.showResults(data); // Ergebnisse anzeigen, wenn ein Gewinner festgelegt wurde
+        console.log('setWinner event received for player:', data);
+        observer.next(data);
+        this.showResults(data);
       });
+
       return () => {
         socket.off('setWinner');
       };
@@ -113,14 +122,8 @@ export class GameDataService {
   }
 
   private showResults(data: GameStatusDto) {
-    console.log('Winner:', data.winner);
-
-    // Navigation nur für den Spieler, der zuletzt gespielt hat
-    if (data.nextPlayer === this.gameObject?.player1.nickname) {
-      this.router.navigate(['/results'], { queryParams: { winner: data.winner } });
-    } else {
-      console.log("Ergebnissseite nicht für diesen Spieler angezeigt.");
-    }
+    console.log('Navigating to results for winner:', data.winner);
+    this.router.navigate(['/results'], { queryParams: { winner: data.winner } });
   }
 
   disconnect() {

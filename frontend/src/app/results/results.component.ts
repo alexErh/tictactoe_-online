@@ -27,19 +27,21 @@ export class ResultsComponent implements OnInit {
 
   private listenForWinner(): void {
     this.gameDataService.listenForWinner().subscribe((data: GameStatusDto) => {
+      console.log('Winner received on client:', data.winner); // Log für Gewinneranzeige
       this.updateGameStatus(data);
-      this.gameId = data.id;
+      this.router.navigate(['/results'], { queryParams: { winner: data.winner } });
     });
   }
 
-
   private updateGameStatus(data: GameStatusDto): void {
+    console.log('Game status updated:', data); // Logging der erhaltenen Daten
     this.player1 = data.player1;
     this.player2 = data.player2;
-    this.winner = data.winner ? data.winner : 'Kein Gewinner';
+    this.winner = data.winner ? data.winner : 'Keiner';
   }
 
   playAgain(): void {
     this.router.navigate(['/matchmaking']);
   }
 }
+
