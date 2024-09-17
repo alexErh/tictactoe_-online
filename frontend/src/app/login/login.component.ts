@@ -21,20 +21,20 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private router: Router,
     private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
-    
+
     this.authService.signInWithSession()
     const message = localStorage.getItem('redirectionMessage');
     console.log('message1', message);
     localStorage.setItem('redirectionMessage', '');
     console.log('message2', localStorage.getItem('redirectionMessage'))
     if (message) {
-      
+
     }
   }
 
@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
           const nickname = response.nickname;
           const isAdmin = response.isAdmin;
 
-          
+
           this.router.navigate(['/start']);
         },
         error: (err) => {
