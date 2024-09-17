@@ -18,8 +18,8 @@ export class MatchmakingQueueService {
   private matchFound$ = new BehaviorSubject<Player | null>(null);
   private gameObject: any;
   constructor(
-    private http: HttpClient, 
-    private gameDataService: GameDataService, 
+    private http: HttpClient,
+    private gameDataService: GameDataService,
     private webSocketService: WebsocketService,
     private authService: AuthService,
   ) {

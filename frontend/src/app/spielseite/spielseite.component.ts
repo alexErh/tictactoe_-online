@@ -35,7 +35,9 @@ export class SpielseiteComponent implements OnInit {
     private authService: AuthService,
     private gameService: GameDataService,
     private router: Router
-  ) {}
+  ) {
+    this.currentPlayer = this.gameService.getNextPlayer();
+  }
 
   ngOnInit() {
     const user = this.authService.getUser();
@@ -51,7 +53,7 @@ export class SpielseiteComponent implements OnInit {
           this.opponent_img = 'data:image/png;base64,'+data;
         },
         error: (error) => {
-          console.error('Error fetching image:', error);          
+          console.error('Error fetching image:', error);
         }
       })
     }
@@ -80,6 +82,7 @@ export class SpielseiteComponent implements OnInit {
     if (!this.squares[idx].value){
       this.squares[idx] = new Square(this.currentPlayerData!.symbol);
       this.gameService.makeMove(this.squares.map(item => item.value));
+      this.currentPlayer = this.gameService.getNextPlayer();
     }else {
       console.error('Ungültiger Zug: currentSymbol ist null oder undefined');
     }
