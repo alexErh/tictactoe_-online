@@ -58,7 +58,6 @@ export class GameController {
   async getGameStatistics(
     @Param('nickname') nickname: string,
   ): Promise<{ wins: number; losses: number; games: ReturnGameDto[] }> {
-    console.log('stats')
     return await this.gameService.getGameStatistics(nickname);
   }
 

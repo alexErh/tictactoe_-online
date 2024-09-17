@@ -2,21 +2,21 @@
   <div class="row m-5">
     <div class="col">
       <div class="row">
-        <div class="col-2">
-          <img src="{{ currentUser_img }}" alt="{{ currentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;"/>
+        <div class="col-3">
+          <img src="{{ currentUser_img }}" alt="{{ currentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 75px; height: 75px; object-fit: cover;"/>
         </div>
         <div class="col-4">
           <p>{{ currentPlayerData?.nickname }} Score: <span id="player-elo">{{ currentPlayerData?.score }}</span></p>
         </div>
       </div>
     </div>
-    <div class="col text-end">
+    <div class="col text-end align-middle">
       <div class="row justify-content-end">
         <div class="col-4">
           <p>{{ opponentPlayerData?.nickname }} Score: <span id="opponent-elo">{{ opponentPlayerData?.score }}</span></p>
         </div>
-        <div class="col-2">
-          <img [src]="opponent_img" alt="{{ opponentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;"/>
+        <div class="col-3">
+          <img [src]="opponent_img" alt="{{ opponentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 75px; height: 75px; object-fit: cover;"/>
         </div>
       </div>
     </div>
