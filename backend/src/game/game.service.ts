@@ -45,7 +45,16 @@ export class GameService {
     
       return (
         await this.gameRepository.find({
-          where: [{ player1: user }, { player2: user }],
+          where: [
+            { 
+              player1: user,
+              winner: Not(IsNull()),
+            }, 
+            { 
+              player2: user,
+              winner: Not(IsNull()), 
+            }
+          ],
           relations: ['player1', 'player2'],
         })
       ).map((e) => {
