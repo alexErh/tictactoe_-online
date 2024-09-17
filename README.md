@@ -64,20 +64,12 @@ Das Frontend des Projekts ist modular aufgebaut und enthält verschiedene Seiten
 
 **Dateipfad:** `./frontend/src/app/admin/`
 
-### 8. Ergebnis-Seite nach Spielende (Result Page)
-**Funktionen:**
-- Anzeige des Spielergebnisses nach Spielende
-- Aktualisierte Elo-Zahlen für beide Spieler
-- Möglichkeit, zur Startseite oder zur Spielhistorie zu navigieren
-
-**Dateipfad:** `./frontend/src/app/resultat/`
-
-### 9. Navigationskomponente
+### 8. Navigationskomponente
 Eine **Navigationskomponente** ist in mehreren Seiten eingebettet, wie in der Startseite, Profilseite, Ergebnisseite und Adminseite. Diese Komponente ermöglicht eine einfache Navigation zwischen den verschiedenen Bereichen der Anwendung.
 
 **Dateipfad:** `./frontend/src/app/navigation/`
 
-### 10. Service-Dateien
+### 9. Service-Dateien
 Die Service-Datei stellt die Verbindung zwischen dem Frontend und dem Backend her. Sie ermöglichen die Kommunikation mit der Datenbank und enthalten die benötigten Logiken für Authentifizierung, Spielverlauf und weitere Operationen. Zu den wichtigsten Services gehören:
 
 - `admin.service`: Verwalten der Admin-Operationen (Spielüberwachung, Nutzerverwaltung)
@@ -91,7 +83,7 @@ Die Service-Datei stellt die Verbindung zwischen dem Frontend und dem Backend he
 **Dateipfad:** `./frontend/src/app/services/`
 
 
-### 11. Helpers-Datei mit Guards
+### 10. Helpers-Datei mit Guards
 In der **helpers**-Datei werden **Guards** über das Quarts-Framework verwendet, um den Zugriff auf bestimmte Seiten oder Funktionen zu beschränken. Es gibt zwei Haupt-Guards, die verwendet werden:
 
 1. **auth.guard**:
