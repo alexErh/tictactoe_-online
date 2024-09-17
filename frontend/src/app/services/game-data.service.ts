@@ -1,27 +1,12 @@
 import { inject, Injectable, OnInit } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import { io, Socket } from 'socket.io-client';
-import { Player } from '../models/player.model';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { WebsocketService } from './websocket.service';
-import { considerSettingUpAutocompletion } from '@angular/cli/src/utilities/completion';
-import { MatchmakingQueueService } from './matchmaking-queue.service';
-type CellValue = 'X' | 'O' | null;
-export interface PlayerDto {
-  clientId: string | undefined;
-  nickname: string;
-  score: number;
-  symbol: 'X' | 'O';
-}
+import { GameStatusDto } from '../DTOs/gameStateDto';
+import { CellValue, PlayerDto } from '../DTOs/playerDto';
+import { AuthService } from './auth.service';
+import { UserDto } from '../DTOs/userDto';
 
-export interface GameStatusDto {
-  id: string;
-  player1: PlayerDto;
-  player2: PlayerDto;
-  nextPlayer: string;
-  winner: string | null;
-  board: CellValue[];
-}
 
 
 
@@ -29,106 +14,62 @@ export interface GameStatusDto {
   providedIn: 'root'
 })
 export class GameDataService {
-  private gameObject: any;
+  private userApiUrl = 'http://localhost:3000/users';
+
+  private gameObject?: GameStatusDto;
   private gameBoard: CellValue[] = Array(9).fill(null);
-  private nextPlayer: string| null = null;
-  private apiUrl = 'http:/localhost:3000/game'
+  private nextPlayer: string = '';
+  private currentPlayerData?: PlayerDto;
+  private opponentPlayerData?: PlayerDto;
 
-  constructor(private webSocketService: WebsocketService) {
+  opponentImg = '';
 
+  constructor(
+    private webSocketService: WebsocketService,
+    private authService: AuthService,
+    private http: HttpClient, 
+  ) {
   }
+
+  getGameState(): GameStatusDto | undefined {
+    return this.gameObject;
+  }
+
   getNextPlayer() {
     return this.nextPlayer;
   }
 
-  getPlayerData(): void {
-    this.webSocketService.listen('playerDataResponse').subscribe({
-      next: (data) => {
-        if (data) {
-          this.currentPlayerData = data.currentPlayer;
-          this.opponentPlayerData = data.opponentPlayer;
-          console.log('Current Player Data:', this.currentPlayerData);
-          console.log('Opponent Player Data:', this.opponentPlayerData);
-        } else {
-          console.warn('No player data received');
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching player data', error);
-      }
-    });
-
-    this.webSocketService.getSocket().emit('getPlayerData');
+  getOpponentImg(nickname: string): Observable<string> {
+    return this.http.get(`${this.userApiUrl}/${nickname}/pic`, { 
+      withCredentials: true,
+      responseType: 'text'
+     });
   }
 
+  getPlayerData(): void {
+    const currentUser = this.authService.getUser();
+    this.currentPlayerData = this.gameObject?.player1.nickname === currentUser.nickname ? this.gameObject.player1 : this.gameObject?.player2;
+    this.opponentPlayerData = this.gameObject?.player2.nickname === currentUser.nickname ? this.gameObject.player1 : this.gameObject?.player2;
+  }
 
   saveGameObject(gameObject: any) {
     this.gameObject = gameObject;
     this.nextPlayer = gameObject.nextPlayer;
-    console.log('Game object saved:', this.gameObject);
+    this.getPlayerData();
   }
 
-  makeMove(idx: number): CellValue  {
-    console.log("idx server: " + idx);
-    // Bestimmen, welcher Spieler am Zug ist
-    const currentPlayerSymbol = this.gameObject.nextPlayer === this.gameObject.player1.nickname
-      ? this.gameObject.player1.symbol
-      : this.gameObject.player2.symbol;
-    console.log("next", this.nextPlayer);
-
-    // Das Board wird hier aus dem aktuellen Spielstatus aktualisiert
-
-    console.log("updateBoard", this.gameBoard);
-    if (this.gameBoard[idx] === null) { // Nur ein Zug erlauben, wenn das Feld leer ist
-      this.gameBoard[idx] = currentPlayerSymbol; // Setze das Feld auf das Symbol des aktuellen Spielers
-    } else {
-      console.error('Das Feld ist bereits belegt');
-      return null;
-    }
-
+  makeMove(board: CellValue[]): void {
     // Erstelle das neue GameStatusDto mit dem aktualisierten Board
-    const gameStatus: GameStatusDto = {
-      id: this.gameObject.id,
-      player1: this.gameObject.player1,
-      player2: this.gameObject.player2,
-      nextPlayer: this.gameObject.nextPlayer === this.gameObject.player1.nickname
-        ? this.gameObject.player2.nickname
-        : this.gameObject.player1.nickname, // Den nächsten Spieler setzen
-      winner: null,
-      board: this.gameBoard
-    };
-    this.nextPlayer = gameStatus.nextPlayer;
+    
+    this.gameObject!.board = board;
+    this.gameObject!.nextPlayer = this.nextPlayer === this.gameObject?.player1.nickname 
+      ? this.gameObject!.player2.nickname 
+      : this.gameObject!.player1.nickname;
+
+    this.nextPlayer = this.gameObject!.nextPlayer;
 
     // Sende den neuen Spielstatus an den Server
-    this.webSocketService.getSocket().emit('makeMove', gameStatus);
-    console.log('Move sent to server:', gameStatus);
-    return currentPlayerSymbol;
-  }
-
-  listen(event: string): Observable<GameStatusDto> {
-    return new Observable<GameStatusDto>(observer => {
-      const socket = this.webSocketService.getSocket();
-
-      socket.on(event, (data: GameStatusDto) => {
-        if (event === 'newState') {
-          this.gameBoard = data.board;
-          //this.nextPlayer = data.nextPlayer;
-        }
-        observer.next(data);
-      });
-      return () => {
-        socket.off(event);
-      };
-    });
-  }
-
-
-
-
-  disconnect() {
-    if (this.webSocketService.getSocket()) {
-      this.webSocketService.getSocket().disconnect();
-    }
+    this.webSocketService.getSocket().emit('makeMove', this.gameObject);
   }
 
 }

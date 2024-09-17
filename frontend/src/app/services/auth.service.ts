@@ -69,6 +69,10 @@ export class AuthService {
     );
   }
 
+  checkSession() {
+    return this.http.get<{ sessionActive: boolean }>(`${this.apiUrl}/session-status`, {withCredentials: true});
+  }
+
   setCurrentUser(user: UserDto): void {
     this.user = user;
 
@@ -76,11 +80,11 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    console.log('isAdmin', this.isUserLogged() && this.user.isAdmin)
     return this.isUserLogged() && this.user.isAdmin;
   }
 
   isUserLogged(): boolean {
+    sessionStorage.getItem
     return this.user.nickname.length !== 0;
   }
 
@@ -90,5 +94,9 @@ export class AuthService {
 
   getUser(): UserDto {
     return this.user;
+  }
+
+  refresh() {
+    this.signInWithSession();
   }
 }

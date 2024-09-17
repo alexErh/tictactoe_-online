@@ -1,8 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { SquareComponent } from "../square/square.component";
-import { GameDataService, PlayerDto, GameStatusDto } from '../services/game-data.service';
+import { GameDataService } from '../services/game-data.service';
 import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
 import { WebsocketService } from '../services/websocket.service';
+import { AuthService } from '../services/auth.service';
+import { CellValue, PlayerDto } from '../DTOs/playerDto';
+import { Observable, tap } from 'rxjs';
+import { GameStatusDto } from '../DTOs/gameStateDto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-spielseite',
@@ -14,60 +19,53 @@ import { WebsocketService } from '../services/websocket.service';
   styleUrl: './spielseite.component.css'
 })
 export class SpielseiteComponent implements OnInit {
-  public gameService: GameDataService = inject(GameDataService);
   public websocketService: WebsocketService = inject(WebsocketService);
 
   squares: Square[] = [];
-  winner: string | null | undefined;
-  currentPlayer: string | null = null;
-  myNickname: string | null = null;
-  currentPlayerData: PlayerDto | null = null;
-  opponentPlayerData: PlayerDto | null = null;
+  winner?: string = undefined;
+  currentPlayer?: string;
+  myNickname?: string;
+  currentPlayerData?: PlayerDto;
+  opponentPlayerData?: PlayerDto;
 
-  constructor(private matchmakingQueueService: MatchmakingQueueService) {}
+  currentUser_img: string = '';
+  opponent_img: string = '';
+
+  constructor(
+    private authService: AuthService,
+    private gameService: GameDataService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.getMyNickname();
+    const user = this.authService.getUser();
+    if (user) {
+      this.myNickname = user.nickname;
+      this.currentUser_img = 'data:image/png;base64,'+user.img;
+    }
     this.newGame();
-    this.listenToGameUpdates();
-  }
-  getMyNickname() {
-    this.matchmakingQueueService.getPlayerName().subscribe({
-      next: (playerData) => {
-        if (playerData) {
-          this.myNickname = playerData;
-          console.log('My Nickname:', this.myNickname);
-          this.getPlayerData(); // Spielerinformationen abrufen
-        } else {
-          console.error('No player name available');
+    this.getPlayerData();
+    if (this.opponentPlayerData){
+      this.gameService.getOpponentImg(this.opponentPlayerData.nickname).subscribe({
+        next: (data) => {
+          this.opponent_img = 'data:image/png;base64,'+data;
+        },
+        error: (error) => {
+          console.error('Error fetching image:', error);          
         }
-      },
-      error: (error) => {
-        console.error('Error fetching player name', error);
-      }
-    });
+      })
+    }
+    this.listenToGameUpdates();
   }
 
   getPlayerData() {
-    this.websocketService.listen('playerDataResponse').subscribe({
-      next: (data) => {
-        if (data) {
-          this.currentPlayerData = data.currentPlayer;
-          this.opponentPlayerData = data.opponentPlayer;
-          console.log('Current Player Data:', this.currentPlayerData);
-          console.log('Opponent Player Data:', this.opponentPlayerData);
-        } else {
-          console.warn('No player data received');
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching player data', error);
-      }
-    });
+    const state = this.gameService.getGameState();
+    this.currentPlayerData = state?.player1.nickname === this.myNickname ? state?.player1 : state?.player2;
+    this.opponentPlayerData = state?.player2.nickname === this.myNickname ? state?.player1 : state?.player2;
 
-    // Emit event to request player data
-    this.websocketService.getSocket().emit('getPlayerData');
   }
+
+
   newGame() {
     this.squares = Array(9).fill(null).map(() => new Square(null));
     this.winner = undefined;
@@ -79,37 +77,35 @@ export class SpielseiteComponent implements OnInit {
       alert('Es ist nicht dein Zug!');
       return;
     }
-    console.log("makeMove", idx)
-    const currentSymbol = this.gameService.makeMove(idx);
-    console.log("current", currentSymbol);
-    if (currentSymbol === 'X' || currentSymbol === 'O') {
-      this.squares[idx] = new Square(currentSymbol);
-    }
-    else {
+    if (!this.squares[idx].value){
+      this.squares[idx] = new Square(this.currentPlayerData!.symbol);
+      this.gameService.makeMove(this.squares.map(item => item.value));
+    }else {
       console.error('Ungültiger Zug: currentSymbol ist null oder undefined');
     }
   }
 
   listenToGameUpdates() {
-    this.gameService.listen('newState').subscribe((newGameState) => {
-      console.log('Received new game state from server:', newGameState);
-      this.squares = newGameState.board.map(value => new Square(value));
-      this.currentPlayer = newGameState.nextPlayer;
-      console.log("current.player", this.currentPlayer);
+    this.websocketService.listen('newState').subscribe((newState: GameStatusDto) => {
+      this.squares = newState.board.map(value => new Square(value));
+      this.currentPlayer = newState.nextPlayer;
     });
 
-    this.gameService.listen('setWinner').subscribe((finalState) => {
-      console.log('Received final game state (winner) from server:', finalState);
+    this.websocketService.listen('setWinner').subscribe((finalState: GameStatusDto) => {
       this.squares = finalState.board.map(value => new Square(value));
-      this.winner = finalState.winner;
-      this.gameService.disconnect();
+      this.winner = finalState.winner as string;
+      this.websocketService.disconnect();
     });
+  }
+
+  goToStart() {
+    this.authService.refresh()
   }
 
 }
 
 class Square {
-  value: 'X' | 'O' | null;
+  value: CellValue;
   constructor(value: 'X' | 'O' | null) {
     this.value = value;
   }

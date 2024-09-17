@@ -44,7 +44,7 @@ export class UsersController {
         return user;
     }
 
-    @Get(":nickname/img")
+    @Get(":nickname/pic")
     @ApiResponse({type: "string"})
     async getImg(@Param("nickname") nickname: string): Promise<string> {
         return await this.usersService.getImg(nickname);

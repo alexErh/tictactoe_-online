@@ -37,7 +37,6 @@ export class ProfilseiteComponent implements OnInit {
   playerStats: PlayerStats | null = null;
   gameHistory: any[] = [];
   profileForm: FormGroup;
-  profileImage: string | null = null;
   defaultProfileImage: string = 'assets/portrait.jpg';
   isStatsLoaded: boolean = false;
   isHistoryLoaded: boolean = false;
@@ -62,7 +61,6 @@ export class ProfilseiteComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.loadProfileImage();
     this.loadPlayerStats();
     this.loadGameHistory();
     this.loadGameStatistics();
@@ -80,7 +78,6 @@ export class ProfilseiteComponent implements OnInit {
             wins: data.wins || 0,
             losses: data.losses || 0,
           };
-          this.profileImage = this.playerStats.img || this.defaultProfileImage;
           this.loadGameStatistics();
         },
         error: (error) => {
@@ -125,30 +122,6 @@ export class ProfilseiteComponent implements OnInit {
           alert('Fehler beim Laden der Spielstatistiken: ' + error.message);
         }
       });
-    }
-  }
-
-  loadProfileImage() {
-    if (this.playerStats?.nickname) {
-      this.profileImage$ = this.profileService.getProfileImage(this.playerStats.nickname).pipe(
-        switchMap((blob) => {
-          const reader = new FileReader();
-          return new Observable<string>(observer => {
-            reader.onload = () => {
-              observer.next(reader.result as string);
-              observer.complete();
-            };
-            reader.onerror = (error) => {
-              observer.error(error);
-            };
-            reader.readAsDataURL(blob);
-          });
-        }),
-        catchError((error) => {
-          console.error('Error loading profile image:', error);
-          return of(this.defaultProfileImage);
-        })
-      );
     }
   }
 

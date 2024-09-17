@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatchmakingQueueService } from '../services/matchmaking-queue.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Player } from '../models/player.model';
+import { AuthService } from '../services/auth.service';
+import { PlayerDto } from '../DTOs/playerDto';
 
 @Component({
   selector: 'app-matchmaking-queue',
@@ -13,19 +14,19 @@ import { Player } from '../models/player.model';
   styleUrls: ['./matchmaking-queue.component.css'],
 })
 export class MatchmakingQueueComponent implements OnInit  {
-  matchFound: Player | null = null;
+  matchFound?: PlayerDto;
   waiting: boolean = false;
 
   constructor(
     private matchmakingQueueService: MatchmakingQueueService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.joinQueue();
 
     this.matchmakingQueueService.onMatchFound().subscribe((opponent) => {
-      console.log("opponent", opponent);
       if (opponent) {
         this.matchFound = opponent;
         this.waiting = false;
@@ -41,19 +42,10 @@ export class MatchmakingQueueComponent implements OnInit  {
 
 
   joinQueue() {
-    this.matchmakingQueueService.getPlayerName().subscribe({
-      next: (playerData) => {
-        this.waiting = true;
-        if (playerData) {
-          this.matchmakingQueueService.joinQueue(playerData);
-        } else {
-          console.error('No player name available');
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching player name', error);
-      }
-    });
+    const user = this.authService.getUser();
+
+    if (user)
+      this.matchmakingQueueService.joinQueue(user.nickname);
   }
 
   confirmCancelQueue() {

@@ -1,25 +1,46 @@
-<body>
-<div class="game-page">
-  <div class="player-info">
-    <img src="{{ currentPlayerData?.img }}" alt="{{ currentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" />
-    <p>{{ currentPlayerData?.nickname }} Score: <span id="player-elo">{{ currentPlayerData?.score }}</span></p>
-  </div>
-  <div class="opponent-info">
-    <img src="{{ opponentPlayerData?.img }}" alt="{{ opponentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" />
-    <p>{{ opponentPlayerData?.nickname }} Score: <span id="opponent-elo">{{ opponentPlayerData?.score }}</span></p>
-  </div>
-</div>
-<div class="game-container">
-    <div>
-      @if (winner) {
-      <h2 id="game-result-message">{{ winner === 'Draw' ? 'Draw' : (winner + ' won the game!') }}</h2>
-      }
+<div class="col">
+  <div class="row m-5">
+    <div class="col">
+      <div class="row">
+        <div class="col-2">
+          <img src="{{ currentUser_img }}" alt="{{ currentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;"/>
+        </div>
+        <div class="col-4">
+          <p>{{ currentPlayerData?.nickname }} Score: <span id="player-elo">{{ currentPlayerData?.score }}</span></p>
+        </div>
+      </div>
     </div>
-    <main id="main-game-content">
-      @for (val of squares; track $index) {
-      <app-square [squareValue]="val.value" (click)="makeMove($index)">
-      </app-square>
-      }
-    </main>
+    <div class="col text-end">
+      <div class="row justify-content-end">
+        <div class="col-4">
+          <p>{{ opponentPlayerData?.nickname }} Score: <span id="opponent-elo">{{ opponentPlayerData?.score }}</span></p>
+        </div>
+        <div class="col-2">
+          <img [src]="opponent_img" alt="{{ opponentPlayerData?.nickname }}'s Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;"/>
+        </div>
+      </div>
+    </div>
   </div>
-</body>
+  <div class="row">
+    <div class="game-container">
+      <div>
+        @if (winner) {
+        <h2 id="game-result-message">{{ winner === 'Draw' ? 'Draw' : (winner + ' won the game!') }}</h2>
+        }
+      </div>
+      <main id="main-game-content">
+        @for (val of squares; track $index) {
+        <app-square [squareValue]="val.value" (click)="makeMove($index)">
+        </app-square>
+        }
+      </main>
+    </div>
+  </div>
+  @if (winner) {
+    <div class="row justify-content-center">
+      <div class="d-flex justify-content-center">
+        <button class="btn btn-primary btn-lg m-2" (click)="goToStart()">zu Startseite</button>
+      </div>
+    </div>
+  }
+</div>

@@ -53,8 +53,8 @@ export class ProfileService {
     );
   }
 
-  getProfileImage(nickname: string): Observable<Blob> {
-    return this.http.get(`http://localhost:3000/users/${nickname}/img`, { responseType: 'blob' }).pipe(
+  getProfileImage(nickname: string): Observable<{img: string}> {
+    return this.http.get<{img: string}>(`http://localhost:3000/users/${nickname}/img`, {withCredentials: true}).pipe(
       catchError(error => {
         console.error('Error fetching profile image:', error);
         return throwError(() => new Error('Error fetching profile image'));

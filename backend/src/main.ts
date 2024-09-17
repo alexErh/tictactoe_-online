@@ -32,7 +32,10 @@ async function bootstrap() {
       secret: crypto.randomBytes(32).toString('hex'),
       resave: false,
       saveUninitialized: false,
-      }),
+      cookie: {
+        maxAge: 30*60*1000
+      }
+    }),
   );
 
   const config = new DocumentBuilder()

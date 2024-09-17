@@ -18,7 +18,7 @@ export class AppService {
         
     }
     
-    /*async onModuleInit() {
+    async onModuleInit() {
         await Promise.all(
             users.map(async user => {
                 user.img = readFileSync('src/assets/portrait.jpg');
@@ -32,5 +32,5 @@ export class AppService {
                 await this.gameRepository.save(game);
             })
         )
-    }*/
+    }
 }

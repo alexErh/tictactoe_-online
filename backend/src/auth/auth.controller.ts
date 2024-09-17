@@ -40,7 +40,6 @@ export class AuthController {
 
   @Post('logout')
   logout(@Session() session: SessionData) {
-    console.log('logout', session);
     this.authService.signOut(session);
     return { message: 'Logout successful' };
   }
@@ -51,5 +50,9 @@ export class AuthController {
     return this.authService.getMe(session);
   }
 
+  @Get('session-status')
+  getSessionStatus() {
+    return true;
+  }
 
 }

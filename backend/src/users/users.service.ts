@@ -64,9 +64,9 @@ export class UsersService {
   }
 
   async getImg(nickname: string): Promise<string> {
-    return (
-      await this.userRepository.findOne({ where: { nickname: nickname } })
-    ).img.toString('base64');
+    const user = await this.userRepository.findOne({ where: { nickname: nickname } });
+    console.log(user)
+    return user.img.toString('base64');
   }
 
   async create(
